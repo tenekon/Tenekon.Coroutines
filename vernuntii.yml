@@ -1,0 +1,6 @@
+VersioningMode:
+  Preset: ConventionalCommitsDelivery
+  IncrementFlow: 
+    Condition: ZeroMajor
+    MajorFlow: Downstream
+PreRelease: alpha

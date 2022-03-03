@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Vernuntii</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CSF.CollectionComparers" />
+    <PackageReference Include="NLog" />
+    <PackageReference Include="NLog.Extensions.Logging" />
+    <PackageReference Include="SoftCircuits.OrderedDictionary" />
+    <PackageReference Include="System.CommandLine" />
+    <PackageReference Include="System.CommandLine.NamingConventionBinder" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vernuntii.Configuration\Vernuntii.Configuration.csproj" />
+    <ProjectReference Include="..\Vernuntii.Console.MSBuild.Shared\Vernuntii.Console.MSBuild.Shared.csproj" />
+    <ProjectReference Include="..\Vernuntii.Git\Vernuntii.Git.csproj" />
+    <ProjectReference Include="..\Vernuntii.Calculation\Vernuntii.Calculation.csproj" />
+  </ItemGroup>
+</Project>

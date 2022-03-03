@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Vernuntii.Console.GlobalTool": {
+      "commandName": "Project",
+      "commandLineArgs": "msbuild-integration locate PackageDirectory",
+      "environmentVariables": {
+        "Verbosity": "Verbose"
+      }
+    }
+  }
+}

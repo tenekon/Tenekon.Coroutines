@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <Import Project="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).props" Condition="'$(VernuntiiPropsLoaded)' != 'true'" />
+
+  <PropertyGroup>
+    <VernuntiiMSBuildIntegrationAssemblyFile Condition="'$(VernuntiiMSBuildIntegrationAssemblyFile)' == ''">$(MSBuildThisFileDirectory)..\deps\msbuild\netstandard2.0\$(MSBuildThisFileName).dll</VernuntiiMSBuildIntegrationAssemblyFile>
+  </PropertyGroup>
+
+  <UsingTask AssemblyFile="$(VernuntiiMSBuildIntegrationAssemblyFile)" TaskName="VernuntiiTask" Condition="'$(DisableVernuntii)' != 'true'" />
+
+  <PropertyGroup>
+    <!-- Possible canditates: -->
+    <!--CoreCompile;-->
+    <!--GetAssemblyVersion;
+    GenerateNuspec;
+    _GenerateRestoreProjectSpec;
+    _GetOutputItemsFromPack;-->
+    <!--EnsureWixToolsetInstalled-->
+    <!-- 
+      Sets version informations before the following targets are going
+        to be called:
+      - GetAssemblyVersion: This target sets AssemblyVersion, FileVersion and InformationalVersion.
+      - _GetProjectVersion: Before nuspec can be built it has to collect the versions of project references the package depends on. 
+      - _GetOutputItemsFromPack: We list it because it uses the package version but does not depend on _GetProjectVersion.
+      - GenerateNuspec: When packing, this target creates the .nuspec-file for package.
+    -->
+    <ExecuteVernuntiiTaskBeforeTargets>
+      $(ExecuteVernuntiiTaskBeforeTargets);
+      GetAssemblyVersion;
+      _GetProjectVersion;
+      _GetOutputItemsFromPack;
+      GenerateNuspec;
+    </ExecuteVernuntiiTaskBeforeTargets>
+  </PropertyGroup>
+
+  <Target Name="_EnsureSupportedPlatformForConsole">
+    <Error Text="The platform Vernuntii is currently operating on is not supported" Condition="'$(VernuntiiConsoleExecutablePlatform)' == 'UNSUPPORTED_PLATFORM'" />
+  </Target>
+
+  <PropertyGroup>
+    <ExecuteVernuntiiTaskDependsOn>
+      $(ExecuteVernuntiiTaskDependsOn);
+      _EnsureSupportedPlatformForConsole
+    </ExecuteVernuntiiTaskDependsOn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <VernuntiiConsoleExecutableFile Condition="'$(VernuntiiConsoleExecutableFile)' == ''">$(MSBuildThisFileDirectory)..\deps\console\net6.0\$(VernuntiiConsoleExecutablePlatform)\Vernuntii.Console.$(VernuntiiConsoleExecutablePlatform).dll</VernuntiiConsoleExecutableFile>
+  </PropertyGroup>
+
+  <Target Name="ExecuteVernuntiiTask" BeforeTargets="$(ExecuteVernuntiiTaskBeforeTargets)" DependsOnTargets="$(ExecuteVernuntiiTaskDependsOn)" Condition="'$(DisableVernuntii)' != 'true'">
+
+    <PropertyGroup>
+      <_VernuntiiConsoleExecutableFile Condition="'$(_VernuntiiConsoleExecutableFile)' == ''">$(VernuntiiConsoleExecutableFile)</_VernuntiiConsoleExecutableFile>
+      <_VernuntiiVerbosity Condition="'$(_VernuntiiVerbosity)' == ''">$(VernuntiiVerbosity)</_VernuntiiVerbosity>
+      <_VernuntiiConfigPath Condition="'$(_VernuntiiConfigPath)' == ''">$(VernuntiiConfigPath)</_VernuntiiConfigPath>
+      <_VernuntiiCacheId Condition="'$(_VernuntiiCacheId)' == ''">$(VernuntiiCacheId)</_VernuntiiCacheId>
+      <_VernuntiiCacheCreationRetentionTime Condition="'$(_VernuntiiCacheCreationRetentionTime)' == ''">$(VernuntiiCacheCreationRetentionTime)</_VernuntiiCacheCreationRetentionTime>
+      <_VernuntiiCacheLastAccessRetentionTime Condition="'$(_VernuntiiCacheLastAccessRetentionTime)' == ''">$(VernuntiiCacheLastAccessRetentionTime)</_VernuntiiCacheLastAccessRetentionTime>
+      <_VernuntiiEmptyCaches Condition="'$(_VernuntiiEmptyCaches)' == ''">$(VernuntiiEmptyCaches)</_VernuntiiEmptyCaches>
+      <_VernuntiiDaemonTimeout Condition="'$(_VernuntiiDaemonTimeout)' == ''">$(VernuntiiDaemonTimeout)</_VernuntiiDaemonTimeout>
+    </PropertyGroup>
+
+    <VernuntiiTask ConsoleExecutablePath="$(_VernuntiiConsoleExecutableFile)"
+                   Verbosity="$(_VernuntiiVerbosity)"
+                   ConfigPath="$(_VernuntiiConfigPath)"
+                   CacheId="$(_VernuntiiCacheId)"
+                   CacheCreationRetentionTime="$(_VernuntiiCacheCreationRetentionTime)"
+                   CacheLastAccessRetentionTime="$(_VernuntiiCacheLastAccessRetentionTime)"
+                   EmptyCaches="$(_VernuntiiEmptyCaches)"
+                   DaemonTimeout="$(_VernuntiiDaemonTimeout)">
+      <Output TaskParameter="Major" PropertyName="Vernuntii_Major" />
+      <Output TaskParameter="Minor" PropertyName="Vernuntii_Minor" />
+      <Output TaskParameter="Patch" PropertyName="Vernuntii_Patch" />
+      <Output TaskParameter="VersionCore" PropertyName="Vernuntii_VersionCore" />
+      <Output TaskParameter="PreRelease" PropertyName="Vernuntii_PreRelease" />
+      <Output TaskParameter="HyphenPreRelease" PropertyName="Vernuntii_HyphenPreRelease" />
+      <Output TaskParameter="Build" PropertyName="Vernuntii_Build" />
+      <Output TaskParameter="PlusBuild" PropertyName="Vernuntii_PlusBuild" />
+      <Output TaskParameter="SemanticVersion" PropertyName="Vernuntii_SemanticVersion" />
+      <Output TaskParameter="BranchName" PropertyName="Vernuntii_BranchName" />
+      <Output TaskParameter="BranchTip" PropertyName="Vernuntii_BranchTip" />
+    </VernuntiiTask>
+
+    <PropertyGroup Condition="'$(UpdateVersionPropsFromVernuntiiTask)' != 'false'">
+      <Version>$(Vernuntii_SemanticVersion)</Version>
+      <VersionPrefix>$(Vernuntii_VersionCore)</VersionPrefix>
+      <VersionSuffix>$(Vernuntii_PreRelease)$(Vernuntii_PlusBuild)</VersionSuffix>
+      <PackageVersion>$(Vernuntii_SemanticVersion)</PackageVersion>
+      <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">$(Vernuntii_VersionCore).0</AssemblyVersion>
+      <InformationalVersion Condition="'$(InformationalVersion)' == ''">$(Vernuntii_VersionCore)$(Vernuntii_HyphenPreRelease)+$(Vernuntii_BranchTip.Substring(0,7))</InformationalVersion>
+      <FileVersion Condition="'$(FileVersion)' == ''">$(Vernuntii_VersionCore).0</FileVersion>
+    </PropertyGroup>
+
+  </Target>
+
+</Project>

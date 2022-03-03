@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>Vernuntii.SemVer.Parser</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Vernuntii.SemVer.Parser\Vernuntii.SemVer.Parser.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>Vernuntii</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Vernuntii.SemVer\Vernuntii.SemVer.csproj" />
+    <ProjectReference Include="..\Vernuntii.TestingInfrastructure\Vernuntii.TestingInfrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

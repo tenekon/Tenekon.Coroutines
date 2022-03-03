@@ -1,0 +1,14 @@
+# default branch: implicit test: not specified "VersioningMode" should lead to default
+Branches:
+  - IfBranch: "ContinuousDelivery"
+    VersioningMode: "ContinuousDelivery"
+  #- IfBranch: "ImplicitEmpty"
+  #  VersioningMode:
+  #- IfBranch: "ExplicitEmpty"
+  #  VersioningMode: ""
+  - IfBranch: "ContinuousDeployment"
+    VersioningMode: "ContinuousDeployment"
+  - IfBranch: "Manual"
+    VersioningMode: "Manual"
+  - Ifbranch: "ConventionalCommitsDelivery"
+    VersioningMode: "ConventionalCommitsDelivery"

@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="$(MSBuildThisFileDirectory)../Vernuntii.Console.MSBuild.Orphan/Project.Pack.props" />
+
+  <PropertyGroup>
+    <!-- Single point of truth -->
+    <ConsoleTargetFramework>net6.0</ConsoleTargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <_RuntimeSpecificProject Include="..\Vernuntii.Console.linux-x64\Vernuntii.Console.linux-x64.csproj">
+      <_RuntimeIdentifier>linux-x64</_RuntimeIdentifier>
+    </_RuntimeSpecificProject>
+
+    <_RuntimeSpecificProject Include="..\Vernuntii.Console.win-x64\Vernuntii.Console.win-x64.csproj">
+      <_RuntimeIdentifier>win-x64</_RuntimeIdentifier>
+    </_RuntimeSpecificProject>
+
+    <_RuntimeSpecificProject Include="..\Vernuntii.Console.osx-x64\Vernuntii.Console.osx-x64.csproj">
+      <_RuntimeIdentifier>osx-x64</_RuntimeIdentifier>
+    </_RuntimeSpecificProject>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_IncludeProjectReferencePublishOutputToPackage</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <Target Name="_PublishProjectReferences">
+    <PropertyGroup>
+      <_MSBuildProps>
+        TargetFramework=$(ConsoleTargetFramework);
+        Configuration=$(Configuration)
+      </_MSBuildProps>
+    </PropertyGroup>
+
+    <MSBuild Projects="%(_RuntimeSpecificProject.Identity)" Targets="Restore;Publish" Properties="$(_MSBuildProps)" />
+  </Target>
+
+  <Target Name="_IncludeProjectReferencePublishOutputToPackage" DependsOnTargets="_PublishProjectReferences">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="%(_RuntimeSpecificProject.RelativeDir)bin\$(Configuration)\$(ConsoleTargetFramework)\%(_RuntimeSpecificProject._RuntimeIdentifier)\publish\**\*">
+        <Pack>True</Pack>
+        <PackagePath>deps\console\$(ConsoleTargetFramework)\%(_RuntimeIdentifier)</PackagePath>
+        <Visible>False</Visible>
+      </TfmSpecificPackageFile>
+    </ItemGroup>
+  </Target>
+
+  <Import Project="$(MSBuildThisFileDirectory)../Vernuntii.Console.MSBuild.Orphan/Project.Pack.targets" />
+
+</Project>
