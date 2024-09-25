@@ -1,0 +1,8 @@
+{
+    "profiles": {
+        "Tenekon.Coroutines.GeneratedSources": {
+            "commandName": "DebugRoslynComponent",
+            "targetProject": "..\\Tenekon.Coroutines\\Tenekon.Coroutines.csproj"
+        }
+    }
+}

@@ -1,5 +1,31 @@
-<Project>
-    <PropertyGroup>
-        <LangVersion Condition="'$(LangVersion)' == ''">preview</LangVersion>
-    </PropertyGroup>
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Authors Condition="'$(Authors)' == ''">Tenekon authors and contributors</Authors>
+    <Copyright Condition="'$(Copyright)' == ''">Copyright (c) 2024 Tenekon authors and contributors</Copyright>
+    <Product Condition="'$(Product)' == ''">$(MSBuildProjectName)</Product>
+    <PackageLicenseFile Condition="'$(PackageLicenseFile)' == ''">LICENSE</PackageLicenseFile>
+    <PackageIcon Condition="'$(PackageIcon)' == ''">icon.jpg</PackageIcon>
+    <LangVersion Condition="'$(LangVersion)' == ''">preview</LangVersion>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <!-- CA1848: For high-performance logging scenarios, use the LoggerMessage pattern. -->
+    <NoWarn>$(NoWarn);CA1848</NoWarn>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)\res\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)\res\icon.jpg">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)\README.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 </Project>

@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <!-- <ItemGroup Condition="'$(UseTestConvention)' != 'true'">
-    <PackageReference Include="Kenet.CSharp.Conventions.Base">
+  <PropertyGroup>
+    <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
+  </PropertyGroup>
+
+	<ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" Condition="$(IsPackable)" />
+    <PackageReference Include="GitVersion.MsBuild" Version="5.7.0" Condition="$(IsPackable)">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-  </ItemGroup> -->
+    <PackageReference Include="Teronis.MSBuild.Packaging.ProjectBuildInPackage">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 
   <PropertyGroup>
 		<AllowPackageReferenceWithVersion>true</AllowPackageReferenceWithVersion>
 	</PropertyGroup>
+
+	<Target Name="SetPackageReleaseNotes" DependsOnTargets="GetVersion" BeforeTargets="$(GitVersionTargetsBefore)">
+    <PropertyGroup>
+      <PackageReleaseNotes>https://github.com/tenekon/Tenekon.MSBuild.Packaging.ProjectBuildInPackage/blob/$(PackageVersion)/CHANGELOG.md</PackageReleaseNotes>
+    </PropertyGroup>
+  </Target>
 
 	<!-- #region Workaround -->
 	<!-- TODO: Remove this region after https://github.com/microsoft/MSBuildSdks/pull/203 is merged -->

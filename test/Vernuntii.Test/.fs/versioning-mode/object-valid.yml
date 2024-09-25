@@ -1,9 +1,0 @@
-﻿Branches:
-  - IfBranch: "OnlyPreset"
-    VersioningMode:
-      Preset: ConventionalCommitsDelivery
-  - IfBranch: "Mixing"
-    VersioningMode:
-      Preset: "Manual"
-      MessageConvention: ConventionalCommits
-      IncrementMode: Successive

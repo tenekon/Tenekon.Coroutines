@@ -1,0 +1,19 @@
+  <Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Tenekon.Reactive.Extensions.Reactive</RootNamespace>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <LangVersion>preview</LangVersion>
+    <DotnetScripTargetFramework>net7.0</DotnetScripTargetFramework>
+    <DotnetScriptVersion>1.5.0</DotnetScriptVersion>
+  </PropertyGroup>
+    
+  <ItemGroup>
+    <ProjectReference Include="..\Tenekon.Coroutines\Tenekon.Coroutines.csproj" />
+    <ProjectReference Include="..\Tenekon.Reactive\Tenekon.Reactive.csproj" />
+  </ItemGroup>
+
+</Project>

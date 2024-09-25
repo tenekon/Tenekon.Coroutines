@@ -1,0 +1,421 @@
+﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tenekon.Coroutines.Benchmark")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tenekon.Coroutines.Test")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tenekon.Reactive.Extensions.Coroutines")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETCoreApp,Version=v7.0", FrameworkDisplayName=".NET 7.0")]
+namespace Tenekon.Collections
+{
+    [System.ComponentModel.Browsable(false)]
+    public abstract class AbstractRobinHoodHashMap<TKey, TValue>
+        where TKey :  notnull
+    {
+        public const double DefaultLoadFactor = 0.5D;
+        public int Count { get; }
+        public System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<TKey, TValue>> Entries { get; }
+        public TValue this[TKey& key] { get; set; }
+        public System.Collections.Generic.IEnumerable<TKey> Keys { get; }
+        public int Size { get; }
+        public System.Collections.Generic.IEnumerable<TValue> Values { get; }
+        public void Clear() { }
+        public bool Contains(in TKey key) { }
+        public void CopyFrom(Tenekon.Collections.AbstractRobinHoodHashMap<TKey, TValue> denseMap) { }
+        public bool Emplace(in TKey key, TValue value) { }
+        public bool Get(in TKey key, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out TValue value) { }
+        public TValue& GetOrUpdate(in TKey key) { }
+        public bool Remove(TKey key) { }
+        public bool Update(in TKey key, TValue value) { }
+        [System.Diagnostics.DebuggerDisplay("{Key} {Value}")]
+        public struct Entry
+        {
+            public TKey Key;
+            public TValue Value;
+            public Entry(TKey key, TValue value) { }
+            public override string ToString() { }
+        }
+    }
+}
+namespace Tenekon.Coroutines
+{
+    public abstract class AbstractCoroutineArgumentReceiverAcceptor : Tenekon.Coroutines.ISiblingCoroutine
+    {
+        protected AbstractCoroutineArgumentReceiverAcceptor() { }
+        protected abstract void AcceptCoroutineArgumentReceiver(ref Tenekon.Coroutines.CoroutineArgumentReceiver argumentReceiver);
+    }
+    [System.Runtime.CompilerServices.AsyncMethodBuilder(typeof(Tenekon.Coroutines.CoroutineMethodBuilder))]
+    public struct Coroutine : System.IEquatable<Tenekon.Coroutines.Coroutine>
+    {
+        public Coroutine(System.Threading.Tasks.Task task) { }
+        public Coroutine(in System.Threading.Tasks.ValueTask task) { }
+        public Coroutine(System.Threading.Tasks.Sources.IValueTaskSource source, short token) { }
+        public Coroutine(System.Threading.Tasks.Task task, Tenekon.Coroutines.ISiblingCoroutine siblingCoroutine) { }
+        public Coroutine(in System.Threading.Tasks.ValueTask task, Tenekon.Coroutines.ISiblingCoroutine siblingCoroutine) { }
+        public Coroutine(System.Threading.Tasks.Sources.IValueTaskSource source, short token, Tenekon.Coroutines.ISiblingCoroutine siblingCoroutine) { }
+        public static Tenekon.Coroutines.Coroutine CompletedCoroutine { get; }
+        public Tenekon.Coroutines.CompilerServices.ConfiguredCoroutineAwaitable ConfigureAwait(bool continueOnCapturedContext) { }
+        public bool Equals(Tenekon.Coroutines.Coroutine other) { }
+        public override bool Equals([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] object? obj) { }
+        public Tenekon.Coroutines.Iterators.IAsyncIterator GetAsyncIterator(in Tenekon.Coroutines.CoroutineContext additiveContext = null, bool isCloneable = false) { }
+        public Tenekon.Coroutines.CompilerServices.CoroutineAwaiter GetAwaiter() { }
+        public override int GetHashCode() { }
+        public static Tenekon.Coroutines.Coroutine FromCanceled(System.Threading.CancellationToken cancellationToken) { }
+        public static Tenekon.Coroutines.Coroutine<TResult> FromCanceled<TResult>(System.Threading.CancellationToken cancellationToken) { }
+        public static Tenekon.Coroutines.Coroutine FromException(System.Exception exception) { }
+        public static Tenekon.Coroutines.Coroutine<TResult> FromException<TResult>(System.Exception exception) { }
+        public static Tenekon.Coroutines.Coroutine<TResult> FromResult<TResult>(TResult result) { }
+        public static Tenekon.Coroutines.CompilerServices.CoroutineAwaitable Start(System.Func<Tenekon.Coroutines.Coroutine> provider, Tenekon.Coroutines.CoroutineContext context = default) { }
+        public static Tenekon.Coroutines.CompilerServices.CoroutineAwaitable<TResult> Start<TResult>(System.Func<Tenekon.Coroutines.Coroutine<TResult>> provider, Tenekon.Coroutines.CoroutineContext context = default) { }
+        public static Tenekon.Coroutines.CompilerServices.CoroutineAwaitable Start<TClosure>(System.Func<TClosure, Tenekon.Coroutines.Coroutine> provider, TClosure closure, Tenekon.Coroutines.CoroutineContext context = default) { }
+        public static Tenekon.Coroutines.CompilerServices.CoroutineAwaitable<TResult> Start<TClosure, TResult>(System.Func<TClosure, Tenekon.Coroutines.Coroutine<TResult>> provider, TClosure closure, Tenekon.Coroutines.CoroutineContext context = default) { }
+        public static Tenekon.Coroutines.Coroutine op_Implicit(System.Threading.Tasks.Task task) { }
+        public static Tenekon.Coroutines.Coroutine op_Implicit(System.Threading.Tasks.ValueTask task) { }
+        public static bool operator !=(Tenekon.Coroutines.Coroutine left, Tenekon.Coroutines.Coroutine right) { }
+        public static bool operator ==(Tenekon.Coroutines.Coroutine left, Tenekon.Coroutines.Coroutine right) { }
+    }
+    [System.Obsolete("Types with embedded references are not supported in this version of your compiler" +
+        ".", true)]
+    [System.Runtime.CompilerServices.CompilerFeatureRequired("RefStructs")]
+    [System.Runtime.CompilerServices.IsByRefLike]
+    public readonly struct CoroutineArgumentReceiver
+    {
+        public void ReceiveCallableArgument<TArgument, TCompletionSource>(in Tenekon.Coroutines.Key argumentKey, in TArgument argument, TCompletionSource completionSource)
+            where TArgument : Tenekon.Coroutines.ICallableArgument<TCompletionSource>
+            where TCompletionSource :  class, Tenekon.Coroutines.ICoroutineCompletionSource { }
+    }
+    public delegate void CoroutineArgumentReceiverDelegate(ref Tenekon.Coroutines.CoroutineArgumentReceiver argumentReceiver);
+    public struct CoroutineContext
+    {
+        public Tenekon.Coroutines.CoroutineContextBequesterOrigin BequesterOrigin { get; }
+        [System.ComponentModel.Browsable(false)]
+        public Tenekon.Coroutines.CoroutineContextServiceMap KeyedServices { get; }
+        [System.ComponentModel.Browsable(false)]
+        public Tenekon.Coroutines.CoroutineContextServiceMap KeyedServicesToBequest { get; }
+        public void OnCoroutineCompleted() { }
+        public static Tenekon.Coroutines.Coroutine<Tenekon.Coroutines.CoroutineContext> Capture() { }
+    }
+    [System.Flags]
+    public enum CoroutineContextBequesterOrigin
+    {
+        RelativeCoroutine = 0,
+        ChildCoroutine = 1,
+        SiblingCoroutine = 2,
+        ContextBequester = 4,
+    }
+    public class CoroutineContextServiceMap : Tenekon.Collections.AbstractRobinHoodHashMap<Tenekon.Coroutines.Key, object>
+    {
+        public CoroutineContextServiceMap() { }
+        public CoroutineContextServiceMap(uint length) { }
+    }
+    public struct CoroutineMethodBuilder
+    {
+        public Tenekon.Coroutines.Coroutine Task { get; }
+        public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
+            where TAwaiter : System.Runtime.CompilerServices.INotifyCompletion
+            where TStateMachine : System.Runtime.CompilerServices.IAsyncStateMachine { }
+        public void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
+            where TAwaiter : System.Runtime.CompilerServices.ICriticalNotifyCompletion
+            where TStateMachine : System.Runtime.CompilerServices.IAsyncStateMachine { }
+        public void SetException(System.Exception e) { }
+        public void SetResult() { }
+        public void SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine stateMachine) { }
+        public void Start<TStateMachine>(ref TStateMachine stateMachine)
+            where TStateMachine : System.Runtime.CompilerServices.IAsyncStateMachine { }
+        public static Tenekon.Coroutines.CoroutineMethodBuilder Create() { }
+    }
+    public struct CoroutineMethodBuilder<TResult>
+    {
+        public Tenekon.Coroutines.Coroutine<TResult> Task { get; }
+        public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
+            where TAwaiter : System.Runtime.CompilerServices.INotifyCompletion
+            where TStateMachine : System.Runtime.CompilerServices.IAsyncStateMachine { }
+        public void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
+            where TAwaiter : System.Runtime.CompilerServices.ICriticalNotifyCompletion
+            where TStateMachine : System.Runtime.CompilerServices.IAsyncStateMachine { }
+        public void SetException(System.Exception e) { }
+        public void SetResult(TResult result) { }
+        public void SetStateMachine(System.Runtime.CompilerServices.IAsyncStateMachine stateMachine) { }
+        public void Start<TStateMachine>(ref TStateMachine stateMachine)
+            where TStateMachine : System.Runtime.CompilerServices.IAsyncStateMachine { }
+        public static Tenekon.Coroutines.CoroutineMethodBuilder<TResult> Create() { }
+    }
+    public sealed class CoroutineScope : System.IDisposable
+    {
+        public CoroutineScope() { }
+        public void Dispose() { }
+        public void OnCoroutineCompleted() { }
+        public int OnCoroutineStarted() { }
+    }
+    public class CoroutineScopeBuilder
+    {
+        public CoroutineScopeBuilder() { }
+        public void AddKeyedService<TServiceKey, TService>(in Tenekon.Coroutines.Key serviceKey, TService service)
+            where TService :  class { }
+        public Tenekon.Coroutines.CoroutineScope BuildCoroutineScope() { }
+    }
+    [System.Runtime.CompilerServices.AsyncMethodBuilder(typeof(Tenekon.Coroutines.CoroutineMethodBuilder<TResult>))]
+    public struct Coroutine<TResult> : System.IEquatable<Tenekon.Coroutines.Coroutine<TResult>>
+    {
+        public Coroutine(System.Threading.Tasks.Task<TResult> task) { }
+        public Coroutine(TResult result) { }
+        public Coroutine(in System.Threading.Tasks.ValueTask<TResult> task) { }
+        public Coroutine(System.Threading.Tasks.Sources.IValueTaskSource<TResult> source, short token) { }
+        public Coroutine(System.Threading.Tasks.Task<TResult> task, Tenekon.Coroutines.ISiblingCoroutine siblingCoroutine) { }
+        public Coroutine(TResult result, Tenekon.Coroutines.ISiblingCoroutine siblingCoroutine) { }
+        public Coroutine(in System.Threading.Tasks.ValueTask<TResult> task, Tenekon.Coroutines.ISiblingCoroutine siblingCoroutine) { }
+        public Coroutine(System.Threading.Tasks.Sources.IValueTaskSource<TResult> source, short token, Tenekon.Coroutines.ISiblingCoroutine siblingCoroutine) { }
+        public Tenekon.Coroutines.CompilerServices.ConfiguredCoroutineAwaitable<TResult> ConfigureAwait(bool continueOnCapturedContext) { }
+        public bool Equals(Tenekon.Coroutines.Coroutine<TResult> other) { }
+        public override bool Equals([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] object? obj) { }
+        public Tenekon.Coroutines.Iterators.IAsyncIterator<TResult> GetAsyncIterator(in Tenekon.Coroutines.CoroutineContext additiveContext = null, bool isCloneable = false) { }
+        public Tenekon.Coroutines.CompilerServices.CoroutineAwaiter<TResult> GetAwaiter() { }
+        public override int GetHashCode() { }
+        public static Tenekon.Coroutines.Coroutine<TResult> op_Implicit(System.Threading.Tasks.Task<TResult> task) { }
+        public static Tenekon.Coroutines.Coroutine<TResult> op_Implicit(System.Threading.Tasks.ValueTask<TResult> task) { }
+        public static bool operator !=(Tenekon.Coroutines.Coroutine<TResult> left, Tenekon.Coroutines.Coroutine<TResult> right) { }
+        public static bool operator ==(Tenekon.Coroutines.Coroutine<TResult> left, Tenekon.Coroutines.Coroutine<TResult> right) { }
+    }
+    public interface ICallableArgument { }
+    public interface ICallableArgument<in TCompletionSource> : Tenekon.Coroutines.ICallableArgument
+        where in TCompletionSource :  class, Tenekon.Coroutines.ICoroutineCompletionSource
+    {
+        void Callback(in Tenekon.Coroutines.CoroutineContext context, TCompletionSource completionSource);
+    }
+    public interface ICoroutineCompletionSource
+    {
+        Tenekon.Coroutines.ICoroutineCompletionSource CreateNew(out short token);
+        void SetException(System.Exception e);
+        void SetResult<TResult>(TResult result);
+    }
+    public interface ISiblingCoroutine { }
+    [System.Diagnostics.DebuggerDisplay("{ToString(),nq}")]
+    public struct Key : System.IEquatable<Tenekon.Coroutines.Key>
+    {
+        public Key(System.Span<byte> scope, ushort argument) { }
+        public Key(System.Span<byte> service, bool inheritable) { }
+        public Key(string service, bool inheritable = false) { }
+        public Key(byte[] scope, ushort argument, bool inheritable = false) { }
+        public byte SchemaVersion { get; }
+        public bool Equals(Tenekon.Coroutines.Key other) { }
+        public override bool Equals([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] object? obj) { }
+        public override int GetHashCode() { }
+        public override string ToString() { }
+        public static bool operator !=(Tenekon.Coroutines.Key left, Tenekon.Coroutines.Key right) { }
+        public static bool operator ==(Tenekon.Coroutines.Key left, Tenekon.Coroutines.Key right) { }
+    }
+    public class KeyEqualityComparer : System.Collections.Generic.EqualityComparer<Tenekon.Coroutines.Key>
+    {
+        public static readonly Tenekon.Coroutines.KeyEqualityComparer Default;
+        public KeyEqualityComparer() { }
+        public override bool Equals(Tenekon.Coroutines.Key x, Tenekon.Coroutines.Key y) { }
+        public override int GetHashCode([System.Diagnostics.CodeAnalysis.DisallowNull] Tenekon.Coroutines.Key obj) { }
+        public static bool Equals(in Tenekon.Coroutines.Key x, in Tenekon.Coroutines.Key y) { }
+        public static uint GetHashCode([System.Diagnostics.CodeAnalysis.DisallowNull] in Tenekon.Coroutines.Key obj) { }
+    }
+    public static class TaskExtensions
+    {
+        public static Tenekon.Coroutines.Coroutine AsCoroutine(this System.Threading.Tasks.Task task) { }
+        public static Tenekon.Coroutines.Coroutine<TResult> AsCoroutine<TResult>(this System.Threading.Tasks.Task<TResult> task) { }
+    }
+    public static class ValueTaskExtensions
+    {
+        public static Tenekon.Coroutines.Coroutine AsCoroutine(in this System.Threading.Tasks.ValueTask task) { }
+        public static Tenekon.Coroutines.Coroutine<TResult> AsCoroutine<TResult>(in this System.Threading.Tasks.ValueTask<TResult> task) { }
+    }
+    public sealed class Yielders
+    {
+        public static readonly Tenekon.Coroutines.Yielders @__co;
+        public Yielders() { }
+        public static Tenekon.Coroutines.Coroutine Call(System.Func<Tenekon.Coroutines.Coroutine> provider) { }
+        public static Tenekon.Coroutines.Coroutine<TResult> Call<TResult>(System.Func<Tenekon.Coroutines.Coroutine<TResult>> provider) { }
+        public static Tenekon.Coroutines.Coroutine Call<TClosure>(System.Func<TClosure, Tenekon.Coroutines.Coroutine> provider, TClosure closure) { }
+        public static Tenekon.Coroutines.Coroutine<TResult> Call<TClosure, TResult>(System.Func<TClosure, Tenekon.Coroutines.Coroutine<TResult>> provider, TClosure closure) { }
+        public static Tenekon.Coroutines.Coroutine<Tenekon.Coroutines.CompilerServices.CoroutineAwaitable> Launch(System.Func<Tenekon.Coroutines.Coroutine> provider) { }
+        public static Tenekon.Coroutines.Coroutine<Tenekon.Coroutines.CompilerServices.CoroutineAwaitable<TResult>> Launch<TResult>(System.Func<Tenekon.Coroutines.Coroutine<TResult>> provider) { }
+        public static Tenekon.Coroutines.Coroutine<Tenekon.Coroutines.CompilerServices.CoroutineAwaitable> Launch<TClosure>(System.Func<TClosure, Tenekon.Coroutines.Coroutine> provider, TClosure closure) { }
+        public static Tenekon.Coroutines.Coroutine<Tenekon.Coroutines.CompilerServices.CoroutineAwaitable<TResult>> Launch<TClosure, TResult>(System.Func<TClosure, Tenekon.Coroutines.Coroutine<TResult>> provider, TClosure closure) { }
+        public static Tenekon.Coroutines.Coroutine<Tenekon.Coroutines.CompilerServices.CoroutineAwaitable> Spawn(System.Func<Tenekon.Coroutines.Coroutine> provider) { }
+        public static Tenekon.Coroutines.Coroutine<Tenekon.Coroutines.CompilerServices.CoroutineAwaitable<TResult>> Spawn<TResult>(System.Func<Tenekon.Coroutines.Coroutine<TResult>> provider) { }
+        public static Tenekon.Coroutines.Coroutine<Tenekon.Coroutines.CompilerServices.CoroutineAwaitable> Spawn<TClosure>(System.Func<TClosure, Tenekon.Coroutines.Coroutine> provider, TClosure closure) { }
+        public static Tenekon.Coroutines.Coroutine<Tenekon.Coroutines.CompilerServices.CoroutineAwaitable<TResult>> Spawn<TClosure, TResult>(System.Func<TClosure, Tenekon.Coroutines.Coroutine<TResult>> provider, TClosure closure) { }
+        public static Tenekon.Coroutines.Coroutine Throw(System.Exception exception) { }
+        public static Tenekon.Coroutines.Coroutine WithContext(Tenekon.Coroutines.CoroutineContext additiveContext, System.Func<Tenekon.Coroutines.Coroutine> provider) { }
+        public static Tenekon.Coroutines.Coroutine<TResult> WithContext<TResult>(Tenekon.Coroutines.CoroutineContext additiveContext, System.Func<Tenekon.Coroutines.Coroutine<TResult>> provider) { }
+        public static Tenekon.Coroutines.Coroutine WithContext<TClosure>(Tenekon.Coroutines.CoroutineContext additiveContext, System.Func<TClosure, Tenekon.Coroutines.Coroutine> provider, TClosure closure) { }
+        public static Tenekon.Coroutines.Coroutine<TResult> WithContext<TClosure, TResult>(Tenekon.Coroutines.CoroutineContext additiveContext, System.Func<TClosure, Tenekon.Coroutines.Coroutine<TResult>> provider, TClosure closure) { }
+        public static Tenekon.Coroutines.Coroutine Yield() { }
+        public static Tenekon.Coroutines.Coroutine YieldReturn<T>(T value) { }
+        public class Arguments
+        {
+            public static readonly Tenekon.Coroutines.Key CallKey;
+            public static readonly Tenekon.Coroutines.Key LaunchKey;
+            public static readonly Tenekon.Coroutines.Key SpawnKey;
+            public static readonly Tenekon.Coroutines.Key ThrowKey;
+            public static readonly Tenekon.Coroutines.Key WithContextKey;
+            public static readonly Tenekon.Coroutines.Key YieldKey;
+            public static readonly Tenekon.Coroutines.Key YieldReturnKey;
+            public Arguments() { }
+            public readonly struct CallArgument<TClosure> : Tenekon.Coroutines.ICallableArgument, Tenekon.Coroutines.ICallableArgument<Tenekon.Coroutines.ManualResetCoroutineCompletionSource<Tenekon.Coroutines.Nothing>>
+            {
+                public CallArgument(System.Delegate provider, TClosure closure, bool isProviderWithClosure) { }
+                public TClosure Closure { get; }
+                public bool IsProviderWithClosure { get; }
+                public System.Delegate Provider { get; }
+            }
+            public readonly struct CallArgument<TClosure, TResult> : Tenekon.Coroutines.ICallableArgument, Tenekon.Coroutines.ICallableArgument<Tenekon.Coroutines.ManualResetCoroutineCompletionSource<TResult>>
+            {
+                public CallArgument(System.Delegate provider, TClosure closure, bool isProviderWithClosure) { }
+                public TClosure Closure { get; }
+                public bool IsProviderWithClosure { get; }
+                public System.Delegate Provider { get; }
+            }
+            public readonly struct LaunchArgument<TClosure> : Tenekon.Coroutines.ICallableArgument, Tenekon.Coroutines.ICallableArgument<Tenekon.Coroutines.ManualResetCoroutineCompletionSource<Tenekon.Coroutines.CompilerServices.CoroutineAwaitable>>
+            {
+                public LaunchArgument(System.Delegate provider, TClosure closure, bool isProviderWithClosure) { }
+                public TClosure Closure { get; }
+                public bool IsProviderWithClosure { get; }
+                public System.Delegate Provider { get; }
+            }
+            public readonly struct SpawnArgument<TClosure> : Tenekon.Coroutines.ICallableArgument, Tenekon.Coroutines.ICallableArgument<Tenekon.Coroutines.ManualResetCoroutineCompletionSource<Tenekon.Coroutines.CompilerServices.CoroutineAwaitable>>
+            {
+                public SpawnArgument(System.Delegate provider, TClosure closure, bool isProviderWithClosure) { }
+                public TClosure Closure { get; }
+                public bool IsProviderWithClosure { get; }
+                public System.Delegate Provider { get; }
+            }
+            public readonly struct WithContextArgument<TClosure> : Tenekon.Coroutines.ICallableArgument, Tenekon.Coroutines.ICallableArgument<Tenekon.Coroutines.ManualResetCoroutineCompletionSource<Tenekon.Coroutines.Nothing>>
+            {
+                public WithContextArgument(System.Delegate provider, TClosure providerClosure, bool isProviderWithClosure) { }
+                public bool IsProviderWithClosure { get; }
+                public System.Delegate Provider { get; }
+                public TClosure ProviderClosure { get; }
+            }
+            public readonly struct WithContextArgument<TClosure, TResult> : Tenekon.Coroutines.ICallableArgument, Tenekon.Coroutines.ICallableArgument<Tenekon.Coroutines.ManualResetCoroutineCompletionSource<TResult>>
+            {
+                public WithContextArgument(System.Delegate provider, TClosure providerClosure, bool isProviderWithClosure) { }
+                public bool IsProviderWithClosure { get; }
+                public System.Delegate Provider { get; }
+                public TClosure ProviderClosure { get; }
+            }
+            public readonly struct YieldReturnArgument<T> : Tenekon.Coroutines.ICallableArgument, Tenekon.Coroutines.ICallableArgument<Tenekon.Coroutines.ManualResetCoroutineCompletionSource<T>>
+            {
+                public YieldReturnArgument(T result) { }
+                public T Result { get; }
+            }
+        }
+    }
+}
+namespace Tenekon.Coroutines.CompilerServices
+{
+    public struct ConfiguredCoroutineAwaitable
+    {
+        public Tenekon.Coroutines.CompilerServices.ConfiguredCoroutineAwaiter GetAwaiter() { }
+    }
+    public struct ConfiguredCoroutineAwaitable<TResult>
+    {
+        public Tenekon.Coroutines.CompilerServices.ConfiguredCoroutineAwaiter<TResult> GetAwaiter() { }
+    }
+    public struct ConfiguredCoroutineAwaiter : System.Runtime.CompilerServices.ICriticalNotifyCompletion, System.Runtime.CompilerServices.INotifyCompletion
+    {
+        public bool IsCompleted { get; }
+        public void GetResult() { }
+        public void OnCompleted(System.Action continuation) { }
+        public void UnsafeOnCompleted(System.Action continuation) { }
+    }
+    public struct ConfiguredCoroutineAwaiter<TResult> : System.Runtime.CompilerServices.ICriticalNotifyCompletion, System.Runtime.CompilerServices.INotifyCompletion
+    {
+        public bool IsCompleted { get; }
+        public TResult GetResult() { }
+        public void OnCompleted(System.Action continuation) { }
+        public void UnsafeOnCompleted(System.Action continuation) { }
+    }
+    public readonly struct CoroutineAwaitable
+    {
+        public System.Threading.Tasks.Task AsTask() { }
+        public Tenekon.Coroutines.CompilerServices.ConfiguredCoroutineAwaitable ConfigureAwait(bool continueOnCapturedContext) { }
+        public Tenekon.Coroutines.CompilerServices.CoroutineAwaiter GetAwaiter() { }
+        public static Tenekon.Coroutines.Coroutine op_Implicit(Tenekon.Coroutines.CompilerServices.CoroutineAwaitable awaitable) { }
+        public static System.Threading.Tasks.ValueTask op_Implicit(Tenekon.Coroutines.CompilerServices.CoroutineAwaitable awaitable) { }
+    }
+    public readonly struct CoroutineAwaitable<TResult>
+    {
+        public System.Threading.Tasks.Task<TResult> AsTask() { }
+        public Tenekon.Coroutines.CompilerServices.ConfiguredCoroutineAwaitable<TResult> ConfigureAwait(bool continueOnCapturedContext) { }
+        public Tenekon.Coroutines.CompilerServices.CoroutineAwaiter<TResult> GetAwaiter() { }
+        public static Tenekon.Coroutines.Coroutine<TResult> op_Implicit(Tenekon.Coroutines.CompilerServices.CoroutineAwaitable<TResult> awaitable) { }
+        public static System.Threading.Tasks.ValueTask<TResult> op_Implicit(Tenekon.Coroutines.CompilerServices.CoroutineAwaitable<TResult> awaitable) { }
+    }
+    public struct CoroutineAwaiter : System.Runtime.CompilerServices.ICriticalNotifyCompletion, System.Runtime.CompilerServices.INotifyCompletion
+    {
+        public bool IsCompleted { get; }
+        public void GetResult() { }
+        public void OnCompleted(System.Action continuation) { }
+        public void UnsafeOnCompleted(System.Action continuation) { }
+    }
+    public struct CoroutineAwaiter<TResult> : System.Runtime.CompilerServices.ICriticalNotifyCompletion, System.Runtime.CompilerServices.INotifyCompletion
+    {
+        public bool IsCompleted { get; }
+        public TResult GetResult() { }
+        public void OnCompleted(System.Action continuation) { }
+        public void UnsafeOnCompleted(System.Action continuation) { }
+    }
+}
+namespace Tenekon.Coroutines.Iterators
+{
+    public static class AsyncIterator
+    {
+        public static Tenekon.Coroutines.Iterators.IAsyncIterator Create(System.Func<Tenekon.Coroutines.Coroutine> provider, in Tenekon.Coroutines.CoroutineContext additiveContext = null, bool isCloneable = false) { }
+        public static Tenekon.Coroutines.Iterators.IAsyncIterator Create(Tenekon.Coroutines.Coroutine coroutine, in Tenekon.Coroutines.CoroutineContext additiveContext = null, bool isCloneable = false) { }
+        public static Tenekon.Coroutines.Iterators.IAsyncIterator<TResult> Create<TResult>(System.Func<Tenekon.Coroutines.Coroutine<TResult>> provider, in Tenekon.Coroutines.CoroutineContext additiveContext = null, bool isCloneable = false) { }
+        public static Tenekon.Coroutines.Iterators.IAsyncIterator<TResult> Create<TResult>(Tenekon.Coroutines.Coroutine<TResult> coroutine, in Tenekon.Coroutines.CoroutineContext additiveContext = null, bool isCloneable = false) { }
+    }
+    public interface IAsyncIterator
+    {
+        object Current { get; }
+        Tenekon.Coroutines.Key CurrentKey { get; }
+        bool IsCloneable { get; }
+        Tenekon.Coroutines.Iterators.IAsyncIterator Clone();
+        void GetResult();
+        Tenekon.Coroutines.Coroutine GetResultAsync();
+        System.Threading.Tasks.ValueTask<bool> MoveNextAsync();
+        void Return();
+        void Throw(System.Exception e);
+        void YieldReturn<TYieldResult>(TYieldResult result);
+    }
+    public interface IAsyncIterator<TResult>
+    {
+        object Current { get; }
+        Tenekon.Coroutines.Key CurrentKey { get; }
+        bool IsCloneable { get; }
+        Tenekon.Coroutines.Iterators.IAsyncIterator<TResult> Clone();
+        TResult GetResult();
+        Tenekon.Coroutines.Coroutine<TResult> GetResultAsync();
+        System.Threading.Tasks.ValueTask<bool> MoveNextAsync();
+        void Return(TResult result);
+        void Throw(System.Exception e);
+        void YieldReturn<TYieldResult>(TYieldResult result);
+    }
+    [System.Flags]
+    public enum SuspensionPointState
+    {
+        None = 0,
+        AwaiterCompletionNotifierRequired = 1,
+        ArgumentSupplied = 2,
+        AwaiterCompletionNotifierSupplied = 4,
+        CoroutineAwaiterSupplied = 8,
+    }
+    public static class Yielders
+    {
+        public static Tenekon.Coroutines.Coroutine<T> Exchange<T>(T value) { }
+        public static class Arguments
+        {
+            public static readonly Tenekon.Coroutines.Key ExchangeKey;
+            public readonly struct ExchangeArgument<T> : Tenekon.Coroutines.ICallableArgument, Tenekon.Coroutines.ICallableArgument<Tenekon.Coroutines.ManualResetCoroutineCompletionSource<T>>
+            {
+                public ExchangeArgument(T result) { }
+                public T Result { get; }
+            }
+        }
+    }
+    public static class YieldersExtensions
+    {
+        public static Tenekon.Coroutines.Coroutine<T> Exchange<T>(this Tenekon.Coroutines.Yielders _, T value) { }
+    }
+}

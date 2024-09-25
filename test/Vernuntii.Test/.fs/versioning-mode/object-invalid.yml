@@ -1,7 +1,0 @@
-﻿Branches:
-  - IfBranch: "OnlyConvention"
-    VersioningMode:
-      MessageConvention: ConventionalCommitsDelivery
-  - IfBranch: "OnlyIncrementMode"
-    VersioningMode:
-      IncrementMode: "None"
