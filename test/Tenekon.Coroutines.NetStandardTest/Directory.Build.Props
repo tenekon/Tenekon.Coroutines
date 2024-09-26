@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <!--<UseMSBuildTestInfrastructure>true</UseMSBuildTestInfrastructure>-->
+    <!--<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>-->
+  </PropertyGroup>
+</Project>

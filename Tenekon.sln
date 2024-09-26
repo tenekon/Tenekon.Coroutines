@@ -29,7 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{14CCA400-AA6
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tenekon.Coroutines", "src\Tenekon.Coroutines\Tenekon.Coroutines.csproj", "{01512A16-EDD0-4554-9A02-952C7DC6A28F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tenekon.Coroutines.Test", "test\Tenekon.Coroutines.Test\Tenekon.Coroutines.Test.csproj", "{D7CBD765-1E24-465E-A8A0-E645DA6FB2E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tenekon.Coroutines.NetTest", "test\Tenekon.Coroutines.NetTest\Tenekon.Coroutines.NetTest.csproj", "{D7CBD765-1E24-465E-A8A0-E645DA6FB2E1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tenekon.Coroutines.Generator", "src\Tenekon.Coroutines.Generator\Tenekon.Coroutines.Generator.csproj", "{CC9488DB-F3B2-4610-8922-DE359D83CBBB}"
 EndProject
@@ -50,6 +50,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shims", "Shims", "{1E4912DF-D5F0-4B0B-BF0E-15E9316B272F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Experimentals", "Experimentals", "{03D2865D-B429-4880-B61D-501676CFD3A7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tenekon.Reactive.Test", "test\Tenekon.Reactive.Test\Tenekon.Reactive.Test.csproj", "{7AF041F0-3AB5-41F2-9625-0BD66F0AC3F0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tenekon.Coroutines.NetStandardTest", "test\Tenekon.Coroutines.NetStandardTest\Tenekon.Coroutines.NetStandardTest.csproj", "{A8FACBB8-8E79-4C01-85DE-97840F0A0002}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +101,14 @@ Global
 		{7BF06708-7753-41E8-A817-BE5BFE9260DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BF06708-7753-41E8-A817-BE5BFE9260DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BF06708-7753-41E8-A817-BE5BFE9260DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AF041F0-3AB5-41F2-9625-0BD66F0AC3F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AF041F0-3AB5-41F2-9625-0BD66F0AC3F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AF041F0-3AB5-41F2-9625-0BD66F0AC3F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AF041F0-3AB5-41F2-9625-0BD66F0AC3F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8FACBB8-8E79-4C01-85DE-97840F0A0002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8FACBB8-8E79-4C01-85DE-97840F0A0002}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8FACBB8-8E79-4C01-85DE-97840F0A0002}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8FACBB8-8E79-4C01-85DE-97840F0A0002}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -111,6 +123,8 @@ Global
 		{5AB8E77F-8EC0-441A-8E57-116858C440CC} = {03D2865D-B429-4880-B61D-501676CFD3A7}
 		{F0AADD48-DA6A-4A2E-9B63-DBF6474CE070} = {1E4912DF-D5F0-4B0B-BF0E-15E9316B272F}
 		{7BF06708-7753-41E8-A817-BE5BFE9260DD} = {1E4912DF-D5F0-4B0B-BF0E-15E9316B272F}
+		{7AF041F0-3AB5-41F2-9625-0BD66F0AC3F0} = {993E4087-E0EC-4713-9576-DD3ECA7062EA}
+		{A8FACBB8-8E79-4C01-85DE-97840F0A0002} = {993E4087-E0EC-4713-9576-DD3ECA7062EA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B2888C95-8ED3-44F8-BD54-15A071471147}
