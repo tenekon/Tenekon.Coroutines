@@ -284,7 +284,7 @@ internal partial class AsyncIteratorImpl<TResult> : IAsyncIterator<TResult>, IAs
                 }
                 coroutineContextSerivce._currentSuspensionPoint.RequireAwaiterCompletionNotifier();
             } else {
-                throw new InvalidOperationException($"The underlying coroutine cannot finish due to the unrecoverable state: {Enum.GetName(currentSuspensionPointState)}");
+                throw new InvalidOperationException($"The underlying coroutine cannot finish due to the unrecoverable state: {Enum.GetName(typeof(SuspensionPointState), currentSuspensionPointState)}");
             }
         }
 

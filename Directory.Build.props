@@ -12,10 +12,13 @@
     <!-- CA1848: For high-performance logging scenarios, use the LoggerMessage pattern. -->
     <NoWarn>$(NoWarn);CA1848</NoWarn>
     <Nullable>enable</Nullable>
+    <LibraryDirectory>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', 'lib'))</LibraryDirectory>
+    <SystemPrivateCoreDirectory>$([MSBuild]::NormalizeDirectory('$(LibraryDirectory)', 'Shim.System.Private.CoreLib', 'src'))</SystemPrivateCoreDirectory>
+    <SnippetsDirectory>$([MSBuild]::NormalizeDirectory('$(LibraryDirectory)', 'Snippets'))</SnippetsDirectory>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)\res\LICENSE">
+    <None Include="$(MSBuildThisFileDirectory)\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

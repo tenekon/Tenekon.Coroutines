@@ -35,7 +35,9 @@ partial struct Coroutine
 
     private static Coroutine StartInternal<TClosure>(Delegate provider, TClosure closure, in CoroutineContext contextToBequest, bool isProviderWithClosure)
     {
-        ArgumentNullException.ThrowIfNull(nameof(provider));
+        if (provider is null) {
+            new ArgumentNullException(nameof(provider));
+        }
         Coroutine coroutine;
         if (isProviderWithClosure) {
             coroutine = Unsafe.As<Delegate, Func<TClosure, Coroutine>>(ref provider)(closure);
@@ -48,7 +50,9 @@ partial struct Coroutine
 
     private static Coroutine<TResult> StartInternal<TClosure, TResult>(Delegate provider, TClosure closure, in CoroutineContext contextToBequest, bool isProviderWithClosure)
     {
-        ArgumentNullException.ThrowIfNull(nameof(provider));
+        if (provider is null) {
+            new ArgumentNullException(nameof(provider));
+        }
         Coroutine<TResult> coroutine;
         if (isProviderWithClosure) {
             coroutine = Unsafe.As<Delegate, Func<TClosure, Coroutine<TResult>>>(ref provider)(closure);

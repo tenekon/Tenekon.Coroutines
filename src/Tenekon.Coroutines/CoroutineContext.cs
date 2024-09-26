@@ -6,7 +6,7 @@ delegate void BequestContextDelegate(ref CoroutineContext context, in CoroutineC
 
 file class CoroutineArgumentReceiverAcceptor(ManualResetCoroutineCompletionSource<CoroutineContext> completionSource) : AbstractCoroutineArgumentReceiverAcceptor
 {
-    protected override void AcceptCoroutineArgumentReceiver(ref CoroutineArgumentReceiver argumentReceiver) => completionSource.SetResult(argumentReceiver._context);
+    protected override void AcceptCoroutineArgumentReceiver(ref CoroutineArgumentReceiver argumentReceiver) => completionSource.SetResult(argumentReceiver.Context);
 }
 
 public struct CoroutineContext

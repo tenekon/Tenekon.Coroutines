@@ -11,8 +11,6 @@ internal interface IAsyncIteratorStateMachineHolder : ICoroutineStateMachineHold
 
 internal interface IAsyncIteratorStateMachineHolder<TResult> : IAsyncIteratorStateMachineHolder, ICoroutineStateMachineHolder<TResult>, IValueTaskSource<TResult>
 {
-    short Version { get; }
-
     void SetAsyncIteratorCompletionSource(IValueTaskCompletionSource<TResult>? completionSource);
     void SetResult(TResult result);
     void SetException(Exception e);

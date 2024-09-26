@@ -42,7 +42,7 @@ internal class FieldAccessor<T, TField>
         }
         il.Emit(OpCodes.Ldflda, coroutineAwaiterFieldInfo); // Load address of the field into the stack
         il.Emit(OpCodes.Ret); // Return the address of the field (by reference)
-        return method.CreateDelegate<GetValueDelegate<T, TField>>();
+        return Unsafe.As< GetValueDelegate < T, TField >>(method.CreateDelegate(typeof(GetValueDelegate<T, TField>)));
     }
 
     /// <summary>

@@ -3,7 +3,7 @@ using System.Reflection.Emit;
 
 namespace Tenekon.Coroutines;
 
-internal static class CoroutineStateMachineAccessorCore<[DAM(StateMachineMemberTypes)] TStateMachine> 
+internal static class CoroutineStateMachineAccessorCore<[DAM(StateMachineMemberTypes)] TStateMachine>
     where TStateMachine : IAsyncStateMachine
 {
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.NonPublicFields | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
@@ -49,7 +49,7 @@ internal static class CoroutineStateMachineAccessorCore<[DAM(StateMachineMemberT
         }
         il.Emit(OpCodes.Ldloc, loc1);
         il.Emit(OpCodes.Ret);
-        return method.CreateDelegate<CloneCoroutineStateMachineDelegate<TStateMachine>>();
+        return Unsafe.As<CloneCoroutineStateMachineDelegate<TStateMachine>>(method.CreateDelegate(typeof(CloneCoroutineStateMachineDelegate<TStateMachine>)));
     }
 
     internal static TStateMachine CloneStateMachineInCompiledRuntime(in TStateMachine stateMachine)
@@ -91,6 +91,6 @@ internal static class CoroutineStateMachineAccessorCore<[DAM(StateMachineMemberT
         }
         il.Emit(OpCodes.Ldflda, builderFieldInfo); // Load address of the field into the stack
         il.Emit(OpCodes.Ret); // Return the address of the field (by reference)
-        return method.CreateDelegate<TDelegate>();
+        return Unsafe.As<TDelegate>(method.CreateDelegate(typeof(TDelegate)));
     }
 }

@@ -51,10 +51,25 @@ public abstract class AbstractRobinHoodHashMap<TKey, TValue> where TKey : notnul
     private const int DefaultShiftToSubtractFrom = 32;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static ref Entry Find(Entry[] array, uint index) => ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(array), index);
+    internal static ref Entry Find(Entry[] array, uint index)
+    {
+#if NETSTANDARD2_1
+        return ref array[index];
+#else
+        return ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(array), index);
+#endif
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ref byte Find(byte[] array, uint index) => ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(array), index);
+    private static ref byte Find(byte[] array, uint index)
+    {
+
+#if NETSTANDARD2_1
+        return ref array[index];
+#else
+        return ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(array), index);
+#endif
+    }
 
     /// <summary>
     /// Gets or sets how many elements are stored in the map
@@ -459,8 +474,8 @@ public abstract class AbstractRobinHoodHashMap<TKey, TValue> where TKey : notnul
     /// </summary>
     public void Clear()
     {
-        Array.Clear(_entries);
-        Array.Clear(_meta);
+        Array.Clear(_entries, 0, _entries.Length);
+        Array.Clear(_meta, 0, _entries.Length);
         _count = 0;
     }
 

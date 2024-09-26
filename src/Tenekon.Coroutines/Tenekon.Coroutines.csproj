@@ -2,18 +2,49 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFrameworks>netstandard2.1;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Tenekon.Coroutines</RootNamespace>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <LangVersion>preview</LangVersion>
     <IsPackable>true</IsPackable>
+    <EnableObjectDumper>false</EnableObjectDumper>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="K4os.Hash.xxHash" Version="1.0.8" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" Condition="'$(Configuration)' != 'Release'" />
   </ItemGroup>
+
+  <Choose>
+    <When Condition="'$(EnableObjectDumper)' == 'true'">
+      <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+      </ItemGroup>
+      <ItemGroup>
+        <Compile Include="$(SnippetsDirectory)ObjectDumper.cs" />
+      </ItemGroup>
+    </When>
+  </Choose>
+
+  <Choose>
+    <When Condition="'$(TargetFramework)' == 'netstandard2.1'">
+      <ItemGroup>
+        <ProjectReference Include="..\..\lib\Shim.System.Runtime\src\Shim.System.Numerics.csproj" PrivateAssets="all" />
+        <ProjectReference Include="..\..\lib\Shim.System.Private.CoreLib\Shim.System.Private.CoreLib.csproj" Aliases="shim" PrivateAssets="all" />
+      </ItemGroup>
+      <ItemGroup>
+        <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+        <PackageReference Include="Nullable" Version="1.3.1" />
+        <PackageReference Include="IsExternalInit" Version="1.0.3" />
+      </ItemGroup>
+      <ItemGroup>
+        <Compile Include="$(SystemPrivateCoreDirectory)System\Diagnostics\CodeAnalysis\UnconditionalSuppressMessageAttribute.cs" />
+        <Compile Include="$(SystemPrivateCoreDirectory)System\Diagnostics\CodeAnalysis\DynamicallyAccessedMembersAttribute.cs" />
+        <Compile Include="$(SystemPrivateCoreDirectory)System\Diagnostics\CodeAnalysis\DynamicallyAccessedMemberTypes.cs" />
+        <Compile Include="$(SystemPrivateCoreDirectory)System\Runtime\CompilerServices\IsByRefAttribute.cs" />
+      </ItemGroup>
+    </When>
+  </Choose>
 
 </Project>

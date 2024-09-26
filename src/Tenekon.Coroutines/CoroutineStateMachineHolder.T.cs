@@ -8,7 +8,7 @@ namespace Tenekon.Coroutines;
 // The .NET Foundation licenses this file to you under the MIT license.
 /// <summary>Provides a strongly-typed box object based on the specific state machine type in use.</summary>
 internal sealed class CoroutineStateMachineHolder<TResult, [DAM(StateMachineMemberTypes)] TStateMachine> : CoroutineStateMachineHolder<TResult>, IValueTaskSource<TResult>, IValueTaskSource,
-    ICoroutineStateMachineHolder<TResult>, IThreadPoolWorkItem, ICoroutineResultStateMachineHolder, IAsyncIteratorStateMachineHolder<TResult>
+    ICoroutineStateMachineHolder<TResult>, ICoroutineResultStateMachineHolder, IAsyncIteratorStateMachineHolder<TResult>
     where TStateMachine : IAsyncStateMachine
 {
     /// <summary>Delegate used to invoke on an ExecutionContext when passed an instance of this box type.</summary>
@@ -187,9 +187,6 @@ internal sealed class CoroutineStateMachineHolder<TResult, [DAM(StateMachineMemb
             ExecutionContext.Run(context, s_callback, this);
         }
     }
-
-    /// <summary>Invoked to run MoveNext when this instance is executed from the thread pool.</summary>
-    void IThreadPoolWorkItem.Execute() => MoveNext();
 
     /// <summary>Get the result of the operation.</summary>
     TResult IValueTaskSource<TResult>.GetResult(short token)

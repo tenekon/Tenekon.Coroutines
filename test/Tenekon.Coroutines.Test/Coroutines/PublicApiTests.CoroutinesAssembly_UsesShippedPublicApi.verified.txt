@@ -1,7 +1,8 @@
-﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tenekon.Coroutines.Benchmark")]
+﻿[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/tenekon/Tenekon.Coroutines.git")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tenekon.Coroutines.Benchmark")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tenekon.Coroutines.Test")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tenekon.Reactive.Extensions.Coroutines")]
-[assembly: System.Runtime.Versioning.TargetFramework(".NETCoreApp,Version=v7.0", FrameworkDisplayName=".NET 7.0")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETStandard,Version=v2.1", FrameworkDisplayName=".NET Standard 2.1")]
 namespace Tenekon.Collections
 {
     [System.ComponentModel.Browsable(false)]
@@ -72,8 +73,6 @@ namespace Tenekon.Coroutines
     }
     [System.Obsolete("Types with embedded references are not supported in this version of your compiler" +
         ".", true)]
-    [System.Runtime.CompilerServices.CompilerFeatureRequired("RefStructs")]
-    [System.Runtime.CompilerServices.IsByRefLike]
     public readonly struct CoroutineArgumentReceiver
     {
         public void ReceiveCallableArgument<TArgument, TCompletionSource>(in Tenekon.Coroutines.Key argumentKey, in TArgument argument, TCompletionSource completionSource)
