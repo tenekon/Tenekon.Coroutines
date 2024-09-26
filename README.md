@@ -6,6 +6,7 @@ You found a bug, have ideas or just want to talk? [Join the Tenekon Community](h
 
 ### Tenekon.Coroutines key facts on a glance
 
+- 100% compatiblity to `Task`/`ValueTask`
 - Async iterators: make coroutines iterable
   - Each suspension point allows to clone the async iterator
 - Fully AOT-compatible
@@ -184,6 +185,13 @@ Use `WithContext` to instruct the coroutine to suspend and invoke `provider` wit
 | `WithContext` | `Coroutine<TResult> WithContext<TResult>(CoroutineContext additiveContext, Func<Coroutine<TResult>> provider)`                                       |
 | `WithContext` | `Coroutine<TResult> WithContext<TClosure, TResult>(CoroutineContext additiveContext, Func<TClosure, Coroutine<TResult>> provider, TClosure closure)` |
 
+#### Yield
+
+Use `Yield` to instruct the coroutine to suspend and resume immediatelly. In the underlying is `Task.Yield()` used.
+
+| Yielder | Signature                     |
+| ------- | ----------------------------- |
+| `Yield` | `Coroutine Coroutine Yield()` |
 
 #### Yield
 
