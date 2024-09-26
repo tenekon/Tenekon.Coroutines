@@ -7,7 +7,7 @@
     <RootNamespace>Tenekon.Reactive</RootNamespace>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <LangVersion>preview</LangVersion>
-    <DotnetScripTargetFramework>net7.0</DotnetScripTargetFramework>
+    <DotnetScripTargetFramework>net6.0</DotnetScripTargetFramework>
     <DotnetScriptVersion>1.5.0</DotnetScriptVersion>
   </PropertyGroup>
 
