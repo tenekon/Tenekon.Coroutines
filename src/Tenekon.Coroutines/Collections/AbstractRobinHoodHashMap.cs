@@ -22,6 +22,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Numerics;
@@ -43,7 +44,7 @@ internal delegate uint ReadonlyReferenceGetHashCodeDelegate<T>([DisallowNull] in
 /// </summary>
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public abstract class AbstractRobinHoodHashMap<TKey, TValue> where TKey : notnull
+public abstract class AbstractRobinHoodHashMap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>> where TKey : notnull
 {
     public const double DefaultLoadFactor = 0.5;
 
@@ -206,17 +207,14 @@ public abstract class AbstractRobinHoodHashMap<TKey, TValue> where TKey : notnul
     /// </exception>
     public TValue this[in TKey key] {
         get {
-            if (Get(in key, out var result)) {
+            if (TryGetValue(in key, out var result)) {
                 return result;
             }
 
             throw Exceptions.KeyNotFound(key);
         }
-        set {
-            if (!Update(key, value)) {
-                throw Exceptions.KeyNotFound(key);
-            }
-        }
+
+        set => SetOrReplace(in key, value);
     }
 
     /// <summary>
@@ -226,7 +224,7 @@ public abstract class AbstractRobinHoodHashMap<TKey, TValue> where TKey : notnul
     /// <param name="value">The value.</param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Emplace(in TKey key, TValue value)
+    internal bool SetOrReplace(in TKey key, TValue value)
     {
         //Resize if loadfactor is reached
         if (_count >= _maxLookupsBeforeResize) {
@@ -277,7 +275,7 @@ public abstract class AbstractRobinHoodHashMap<TKey, TValue> where TKey : notnul
     /// <param name="value">The value.</param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Get(in TKey key, [MaybeNullWhen(false)] out TValue value)
+    public bool TryGetValue(in TKey key, [MaybeNullWhen(false)] out TValue value)
     {
         var index = Hash(in key);
         var maxDistance = index + _maxProbeSequenceLength;
@@ -359,8 +357,10 @@ public abstract class AbstractRobinHoodHashMap<TKey, TValue> where TKey : notnul
         } while (true);
     }
 
+    public void Add(in TKey key, TValue value) => SetOrReplace(in key, value);
+
     /// <summary>
-    ///Updates the value of a specific key
+    /// Updates the value of a specific key
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Update(in TKey key, TValue value)
@@ -465,7 +465,7 @@ public abstract class AbstractRobinHoodHashMap<TKey, TValue> where TKey : notnul
                 continue;
             }
 
-            Emplace(denseMap._entries[i].Key, denseMap._entries[i].Value);
+            SetOrReplace(denseMap._entries[i].Key, denseMap._entries[i].Value);
         }
     }
 
@@ -561,18 +561,16 @@ public abstract class AbstractRobinHoodHashMap<TKey, TValue> where TKey : notnul
         }
     }
 
+    public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => Entries.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => Entries.GetEnumerator();
+
     [DebuggerDisplay("{Key} {Value}")]
     [StructLayout(LayoutKind.Sequential)]
-    public struct Entry
+    public struct Entry(TKey key, TValue value)
     {
-        public TKey Key;
-        public TValue Value;
-
-        public Entry(TKey key, TValue value)
-        {
-            Key = key;
-            Value = value;
-        }
+        public TKey Key = key;
+        public TValue Value = value;
 
         public override string ToString() => $$"""Entry{Key={{Key}}, Value={{Value}}}""";
     }

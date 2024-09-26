@@ -1,6 +1,6 @@
 ﻿using Tenekon.Coroutines;
 
-namespace Tenekon;
+namespace Tenekon.Reactive.Extensions.Coroutines;
 
 public static class ServiceKeys
 {

@@ -66,7 +66,7 @@ public struct CoroutineContext
 
     internal CoroutineScope? Scope {
         get {
-            if (KeyedServicesToBequest.Get(CoroutineScope.s_coroutineScopeKey, out var scope)) {
+            if (KeyedServicesToBequest.TryGetValue(CoroutineScope.s_coroutineScopeKey, out var scope)) {
                 return scope as CoroutineScope;
             }
 

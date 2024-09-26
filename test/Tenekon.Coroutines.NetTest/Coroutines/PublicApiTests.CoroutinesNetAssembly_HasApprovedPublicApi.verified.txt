@@ -5,7 +5,7 @@
 namespace Tenekon.Collections
 {
     [System.ComponentModel.Browsable(false)]
-    public abstract class AbstractRobinHoodHashMap<TKey, TValue>
+    public abstract class AbstractRobinHoodHashMap<TKey, TValue> : System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<TKey, TValue>>, System.Collections.IEnumerable
         where TKey :  notnull
     {
         public const double DefaultLoadFactor = 0.5D;
@@ -15,13 +15,14 @@ namespace Tenekon.Collections
         public System.Collections.Generic.IEnumerable<TKey> Keys { get; }
         public int Size { get; }
         public System.Collections.Generic.IEnumerable<TValue> Values { get; }
+        public void Add(in TKey key, TValue value) { }
         public void Clear() { }
         public bool Contains(in TKey key) { }
         public void CopyFrom(Tenekon.Collections.AbstractRobinHoodHashMap<TKey, TValue> denseMap) { }
-        public bool Emplace(in TKey key, TValue value) { }
-        public bool Get(in TKey key, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out TValue value) { }
+        public System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<TKey, TValue>> GetEnumerator() { }
         public TValue& GetOrUpdate(in TKey key) { }
         public bool Remove(TKey key) { }
+        public bool TryGetValue(in TKey key, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out TValue value) { }
         public bool Update(in TKey key, TValue value) { }
         [System.Diagnostics.DebuggerDisplay("{Key} {Value}")]
         public struct Entry

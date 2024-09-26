@@ -72,7 +72,7 @@ internal partial class AsyncIteratorImpl<TResult> : IAsyncIterator<TResult>, IAs
         iteratorContext._iteratorAgnosticCoroutineContext = context; // Copy befor making context async-iterator-aware
         iteratorContext._coroutineStateMachineHolder = iteratorContext._iteratorAgnosticCoroutineContext.ResultStateMachine as IAsyncIteratorStateMachineHolder<TResult>;
         context._keyedServices = context.KeyedServices.Merge(
-            CoroutineContextServiceMap.CreateRange(1, iteratorContext._iteratorContextService, static (x, y) => x.Emplace(AsyncIterator.s_asyncIteratorKey, y)),
+            CoroutineContextServiceMap.CreateRange(1, iteratorContext._iteratorContextService, static (x, y) => x[in AsyncIterator.s_asyncIteratorKey] = y),
             forceNewInstance: true);
         context._isCoroutineAsyncIteratorSupplier = true;
     }
@@ -332,7 +332,7 @@ internal partial class AsyncIteratorImpl<TResult> : IAsyncIterator<TResult>, IAs
                 theirIterator._iteratorContext = theirIteratorContext;
                 var asyncIteratorSpecificCoroutineContext = ourIteratorContext._iteratorAgnosticCoroutineContext;
                 asyncIteratorSpecificCoroutineContext._keyedServices = asyncIteratorSpecificCoroutineContext.KeyedServices.Merge(
-                    CoroutineContextServiceMap.CreateRange(1, theirIteratorContext._iteratorContextService, static (x, y) => x.Emplace(AsyncIterator.s_asyncIteratorKey, y)),
+                    CoroutineContextServiceMap.CreateRange(1, theirIteratorContext._iteratorContextService, static (x, y) => x[in AsyncIterator.s_asyncIteratorKey] = y),
                     forceNewInstance: true);
                 asyncIteratorSpecificCoroutineContext._isCoroutineAsyncIteratorSupplier = true;
                 theirStateMachineHolder.CoroutineContext = asyncIteratorSpecificCoroutineContext;
@@ -367,7 +367,7 @@ internal partial class AsyncIteratorImpl<TResult> : IAsyncIterator<TResult>, IAs
                 theirIterator._iteratorContext = theirIteratorContext;
                 var asyncIteratorSpecificCoroutineContext = ourIteratorContext._iteratorAgnosticCoroutineContext;
                 asyncIteratorSpecificCoroutineContext._keyedServices = asyncIteratorSpecificCoroutineContext.KeyedServices.Merge(
-                    CoroutineContextServiceMap.CreateRange(1, theirIteratorContext._iteratorContextService, static (x, y) => x.Emplace(AsyncIterator.s_asyncIteratorKey, y)),
+                    CoroutineContextServiceMap.CreateRange(1, theirIteratorContext._iteratorContextService, static (x, y) => x[in AsyncIterator.s_asyncIteratorKey] = y),
                     forceNewInstance: true);
                 asyncIteratorSpecificCoroutineContext._isCoroutineAsyncIteratorSupplier = true;
                 theirStateMachineHolder.CoroutineContext = asyncIteratorSpecificCoroutineContext;

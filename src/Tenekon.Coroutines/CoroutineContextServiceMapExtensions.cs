@@ -52,7 +52,7 @@ internal static class CoroutineContextServiceMapExtensions
                     continue;
                 }
 
-                if (!to.Emplace(from._entries[i].Key, from._entries[i].Value)) {
+                if (!to.SetOrReplace(in from._entries[i].Key, from._entries[i].Value)) {
                     var toEntry = AbstractRobinHoodHashMap<Key, object>.Find(to._entries, to.Hash(from._entries[i].Key));
                     var fromEntry = AbstractRobinHoodHashMap<Key, object>.Find(from._entries, from.Hash(from._entries[i].Key));
                     throw new InvalidOperationException($"""

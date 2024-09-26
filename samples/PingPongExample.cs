@@ -1,7 +1,9 @@
-﻿using Tenekon.Coroutines;
+using Tenekon.Coroutines;
 using Tenekon.Reactive.Broker;
+using Tenekon.Reactive.Extensions.Coroutines;
+using static Tenekon.Reactive.Extensions.Coroutines.Yielders;
 
-namespace Tenekon.Reactive.Extensions.Reactive.Examples;
+namespace PingPong;
 
 internal class PingPongExample
 {
@@ -12,10 +14,9 @@ internal class PingPongExample
     {
         var eventBroker = new EventBroker();
 
-        var context = new CoroutineContext() {
-            _keyedServicesToBequest = CoroutineContextServiceMap.CreateRange(length: 1, eventBroker, static (map, value) => {
-                map.Emplace(ServiceKeys.EventBrokerKey, value);
-            })
+        var context = new CoroutineContext()
+        {
+            KeyedServicesToBequest = { { ServiceKeys.EventBrokerKey, eventBroker } }
         };
 
         var ponging = Coroutine.Start(PingWhenPonged, context);
@@ -28,7 +29,8 @@ internal class PingPongExample
     {
         using var pongedChannel = await Channel(broker => broker.Every(Ponged));
 
-        while (true) {
+        while (true)
+        {
             var ponged = await Take(pongedChannel);
             Console.WriteLine(ponged);
             await Emit(Pinged, new Pong(ponged.Counter)).ConfigureAwait(false);
@@ -39,9 +41,9 @@ internal class PingPongExample
     {
         using var pingedChannel = await Channel(broker => broker.Every(Pinged));
 
-        while (true) {
+        while (true)
+        {
             var pinged = await Take(pingedChannel);
-            Console.WriteLine(pinged);
             await Emit(Ponged, new Pong(pinged.Counter + 1)).ConfigureAwait(false);
         }
     }

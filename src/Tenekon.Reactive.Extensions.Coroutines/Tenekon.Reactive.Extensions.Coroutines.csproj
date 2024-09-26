@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>Tenekon.Reactive.Extensions.Reactive</RootNamespace>
+    <RootNamespace>Tenekon.Reactive.Extensions.Coroutines</RootNamespace>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <LangVersion>preview</LangVersion>
     <DotnetScripTargetFramework>net6.0</DotnetScripTargetFramework>

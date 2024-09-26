@@ -1,4 +1,6 @@
-﻿namespace Tenekon.Coroutines;
+﻿using System.Collections;
+
+namespace Tenekon.Coroutines;
 
 public class CoroutineContextServiceMap : AbstractRobinHoodHashMap<Key, object>
 {
