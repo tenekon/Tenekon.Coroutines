@@ -22,7 +22,7 @@ partial class YieldersTests
 
             var asyncResult = Coroutine.Start(() => Call(async () => {
                 var launch = await Launch(async () => {
-                    await Task.Yield();
+                    await Task.Delay(ContinueAfterTimeInMs).ConfigureAwait(false);
                     records.Add(2);
                 }).ConfigureAwait(false);
 
