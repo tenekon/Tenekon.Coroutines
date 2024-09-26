@@ -6,13 +6,13 @@ You found a bug, have ideas or just want to talk? [Join the Tenekon Community](h
 
 ### Tenekon.Coroutines key facts on a glance
 
-- 100% compatiblity to `Task`/`ValueTask`
+- 100% compatible to `Task`/`ValueTask`
+  - Almost as fast as `ValueTask`
 - Async iterators: make coroutines iterable
   - Each suspension point allows to clone the async iterator
 - Fully AOT-compatible
 - Highly extendible via new yielders and/or custom coroutine context
 - Child coroutines inherit context of their parents: reduce explicit dependency injection
-- Almost as fast as `ValueTask`
 
 ## Installation
 
@@ -39,13 +39,13 @@ dotnet add package Tenekon.Coroutines --version <type version here>
 ```csharp
 using static Tenekon.Coroutines.Yielders;
 
-await Coroutine.Start(asnyc () => {
+await Coroutine.Start(async () => {
   await Call(Console.WriteLine, "Hello world");
 });
 
 // or
 
-await Func<Coroutine>(asnyc () => {
+await Func<Coroutine>(async () => {
   await Call(Console.WriteLine, "Hello world");
 });
 
@@ -59,7 +59,7 @@ await Func<Coroutine>(asnyc () => {
 using static Tenekon.Coroutines.Yielders;
 using static Tenekon.Coroutines.Yielders.Arguments;
 
-var iterator = AsyncIterator.Create(asnyc () => {
+var iterator = AsyncIterator.Create(async () => {
   await Call(Console.WriteLine, "Hello world");
 });
 
@@ -79,7 +79,7 @@ while (await iterator.MoveNextAsync()) {
 using static Tenekon.Coroutines.Yielders;
 using static Tenekon.Coroutines.Yielders.Arguments;
 
-var iterator = AsyncIterator.Create(asnyc () => {
+var iterator = AsyncIterator.Create(async () => {
   await Call(Console.WriteLine, "Hello world");
 });
 
@@ -101,7 +101,7 @@ while (await iterator.MoveNextAsync()) {
 using static Tenekon.Coroutines.Iterator.Yielders;
 using static Tenekon.Coroutines.Iterator.Yielders.Arguments;
 
-var iterator = AsyncIterator.Create(asnyc () => {
+var iterator = AsyncIterator.Create(async () => {
   Console.WriteLine(await Exchange("Hello world"));
 });
 
@@ -193,7 +193,7 @@ Use `Yield` to instruct the coroutine to suspend and resume immediatelly. In the
 | ------- | ----------------------------- |
 | `Yield` | `Coroutine Coroutine Yield()` |
 
-#### Yield
+#### YieldReturn
 
 Use `YieldReturn` to instruct the coroutine to suspend and resume immediatelly. Allows the coroutine middleware to get the hands on `value`.
 
