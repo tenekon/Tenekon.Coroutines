@@ -23,7 +23,7 @@ namespace Tenekon.Coroutines.Benchmark
             var results = new List<int>();
 
             while (await generator.MoveNextAsync()) {
-                results.Add(((YieldReturnArgument<int>)generator.Current).Result);
+                results.Add(((YieldReturnArgument<int>)generator.Current).Value);
             }
 
             static async Coroutine Generator(int runs)

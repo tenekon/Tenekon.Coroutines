@@ -20,6 +20,15 @@ internal partial class AsyncIteratorImpl<TResult> : IAsyncIterator<TResult>, IAs
             Debug.Assert(_nextSuspensionPoint._argument is not null);
             return _nextSuspensionPoint._argument;
         }
+
+        set {
+            EnsureNextOperationIsHavingSuppliedArgument();
+            Debug.Assert(_nextSuspensionPoint._argument is not null);
+            if (!_nextSuspensionPoint._argument.GetType().IsAssignableFrom(value.GetType())) {
+                throw new InvalidCastException($"The provided value of type {value.GetType()} cannot be casted to {_nextSuspensionPoint._argument.GetType()}");
+            }
+            _nextSuspensionPoint._argument = (ICallableArgument)value;
+        }
     }
 
     private readonly ICoroutineHolder _coroutineHolder;
@@ -191,6 +200,26 @@ internal partial class AsyncIteratorImpl<TResult> : IAsyncIterator<TResult>, IAs
                     iteratorContext._iteratorContextService._currentSuspensionPoint.RequireAwaiterCompletionNotifier();
                     Debug.Assert(_nextSuspensionPoint._argumentCompletionSource is not null);
                     _nextSuspensionPoint._argumentCompletionSource.SetResult(result);
+                    iteratorContext._coroutineStateMachineHolder?.MoveNext();
+                }
+            } finally {
+                _nextSuspensionPoint.ResetToNone();
+            }
+        } else {
+            throw Exceptions.NotStartedAlreadyFinishedOrNotSuspended();
+        }
+    }
+
+    public void YieldReturn()
+    {
+        if (_nextSuspensionPoint._state != 0) {
+            try {
+                var iteratorContext = GetIteratorContext(out _);
+
+                if ((_nextSuspensionPoint._state & SuspensionPointState.ArgumentSupplied) != 0) {
+                    iteratorContext._iteratorContextService._currentSuspensionPoint.RequireAwaiterCompletionNotifier();
+                    Debug.Assert(_nextSuspensionPoint._argumentCompletionSource is not null);
+                    _nextSuspensionPoint._argumentCompletionSource.SetResult(default(Nothing)); // ISSUE: hard assumption
                     iteratorContext._coroutineStateMachineHolder?.MoveNext();
                 }
             } finally {

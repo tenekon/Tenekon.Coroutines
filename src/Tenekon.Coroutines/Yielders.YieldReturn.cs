@@ -22,15 +22,15 @@ partial class Yielders
     partial class Arguments
     {
         [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly struct YieldReturnArgument<T>(T result) : ICallableArgument<ManualResetCoroutineCompletionSource<T>>
+        public readonly struct YieldReturnArgument<T>(T value) : ICallableArgument<ManualResetCoroutineCompletionSource<T>>
         {
-            public T Result {
+            public T Value {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get => result;
+                get => value;
             }
 
             void ICallableArgument<ManualResetCoroutineCompletionSource<T>>.Callback(in CoroutineContext context, ManualResetCoroutineCompletionSource<T> completionSource) =>
-                completionSource.SetResult(Result);
+                completionSource.SetResult(Value);
         }
     }
 }

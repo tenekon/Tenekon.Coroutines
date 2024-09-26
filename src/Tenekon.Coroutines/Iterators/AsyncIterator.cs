@@ -25,11 +25,13 @@ public static class AsyncIterator
 
 partial class AsyncIteratorImpl<TResult>
 {
-    object IAsyncIterator.Current => Current;
+    object IAsyncIterator.Current { get => Current; set => Current = value; }
 
     ValueTask<bool> IAsyncIterator.MoveNextAsync() => MoveNextAsync();
 
     void IAsyncIterator.YieldReturn<TYieldResult>(TYieldResult result) => YieldReturn(result);
+
+    void IAsyncIterator.YieldReturn() => YieldReturn();
 
     void IAsyncIterator.Return() => Return(default!);
 

@@ -11,7 +11,7 @@ public interface IAsyncIterator
     /// A non-compatible suspension point is defined as awaiting a task-like object that is not a coroutine yielder.
     /// </summary>
     /// <returns></returns>
-    object Current { get; }
+    object Current { get; set; }
 
     /// <summary>
     /// <see cref="MoveNextAsync"/> will suspend at the next compatible suspension point in the underlying coroutine.
@@ -21,6 +21,8 @@ public interface IAsyncIterator
     ValueTask<bool> MoveNextAsync();
 
     void YieldReturn<TYieldResult>(TYieldResult result);
+
+    void YieldReturn();
 
     void Return();
 

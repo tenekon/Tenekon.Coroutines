@@ -10,7 +10,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Teronis.MSBuild.Packaging.ProjectBuildInPackage">
+    <PackageReference Include="Tenekon.MSBuild.Packaging.ProjectBuildInPackage">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -22,7 +22,7 @@
 
 	<Target Name="SetPackageReleaseNotes" DependsOnTargets="GetVersion" BeforeTargets="$(GitVersionTargetsBefore)">
     <PropertyGroup>
-      <PackageReleaseNotes>https://github.com/tenekon/Tenekon.MSBuild.Packaging.ProjectBuildInPackage/blob/$(PackageVersion)/CHANGELOG.md</PackageReleaseNotes>
+      <PackageReleaseNotes>https://github.com/tenekon/Tenekon.Coroutines/blob/$(PackageVersion)/CHANGELOG.md</PackageReleaseNotes>
     </PropertyGroup>
   </Target>
 

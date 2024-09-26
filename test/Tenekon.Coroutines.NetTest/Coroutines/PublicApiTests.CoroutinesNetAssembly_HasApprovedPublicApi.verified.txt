@@ -296,8 +296,8 @@ namespace Tenekon.Coroutines
             }
             public readonly struct YieldReturnArgument<T> : Tenekon.Coroutines.ICallableArgument, Tenekon.Coroutines.ICallableArgument<Tenekon.Coroutines.ManualResetCoroutineCompletionSource<T>>
             {
-                public YieldReturnArgument(T result) { }
-                public T Result { get; }
+                public YieldReturnArgument(T value) { }
+                public T Value { get; }
             }
         }
     }
@@ -368,7 +368,7 @@ namespace Tenekon.Coroutines.Iterators
     }
     public interface IAsyncIterator
     {
-        object Current { get; }
+        object Current { get; set; }
         Tenekon.Coroutines.Key CurrentKey { get; }
         bool IsCloneable { get; }
         Tenekon.Coroutines.Iterators.IAsyncIterator Clone();
@@ -377,11 +377,12 @@ namespace Tenekon.Coroutines.Iterators
         System.Threading.Tasks.ValueTask<bool> MoveNextAsync();
         void Return();
         void Throw(System.Exception e);
+        void YieldReturn();
         void YieldReturn<TYieldResult>(TYieldResult result);
     }
     public interface IAsyncIterator<TResult>
     {
-        object Current { get; }
+        object Current { get; set; }
         Tenekon.Coroutines.Key CurrentKey { get; }
         bool IsCloneable { get; }
         Tenekon.Coroutines.Iterators.IAsyncIterator<TResult> Clone();
@@ -390,6 +391,7 @@ namespace Tenekon.Coroutines.Iterators
         System.Threading.Tasks.ValueTask<bool> MoveNextAsync();
         void Return(TResult result);
         void Throw(System.Exception e);
+        void YieldReturn();
         void YieldReturn<TYieldResult>(TYieldResult result);
     }
     [System.Flags]

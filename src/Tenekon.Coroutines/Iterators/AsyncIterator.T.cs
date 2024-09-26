@@ -6,11 +6,13 @@ partial class AsyncIteratorImpl<TResult>
 {
     internal static readonly Key s_asyncIteratorKey = new Key(Encoding.ASCII.GetBytes(nameof(AsyncIterator)));
 
-    object IAsyncIterator<TResult>.Current => Current;
+    object IAsyncIterator<TResult>.Current { get => Current; set => Current = value; }
 
     ValueTask<bool> IAsyncIterator<TResult>.MoveNextAsync() => MoveNextAsync();
 
     void IAsyncIterator<TResult>.YieldReturn<TYieldResult>(TYieldResult result) => YieldReturn(result);
+
+    void IAsyncIterator<TResult>.YieldReturn() => YieldReturn();
 
     void IAsyncIterator<TResult>.Return(TResult result) => Return(result);
 
