@@ -7,7 +7,7 @@
     <MSBuildProjectIsLibraryDescendant>$([MSBuild]::MakeRelative('$(LibraryDirectory)','$(MSBuildProjectDirectory)').StartsWith('..'))</MSBuildProjectIsLibraryDescendant>
   </PropertyGroup>
 	<PropertyGroup>
-		<!-- CA1848: For high-performance logging scenarios, use the LoggerMessage pattern. -->
+		<!-- CA1848: For high-performance logging scenarios, use the LoggerMessage pattern -->
 		<NoWarn>$(NoWarn);CA1848</NoWarn>
 		<Nullable>enable</Nullable>
 		<LangVersion Condition="'$(LangVersion)' == ''">12</LangVersion>
