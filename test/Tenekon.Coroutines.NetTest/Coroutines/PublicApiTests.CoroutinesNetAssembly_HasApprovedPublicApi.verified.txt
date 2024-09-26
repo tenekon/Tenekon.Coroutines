@@ -1,5 +1,4 @@
-﻿[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/tenekon/Tenekon.Coroutines.git")]
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tenekon.Coroutines.Benchmark")]
+﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tenekon.Coroutines.Benchmark")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tenekon.Coroutines.NetTest")]
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tenekon.Reactive.Extensions.Coroutines")]
 [assembly: System.Runtime.Versioning.TargetFramework(".NETCoreApp,Version=v6.0", FrameworkDisplayName=".NET 6.0")]
