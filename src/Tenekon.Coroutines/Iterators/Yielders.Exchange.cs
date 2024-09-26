@@ -2,11 +2,11 @@
 
 namespace Tenekon.Coroutines.Iterators;
 
-file class CoroutineArgumentReceiverAcceptor<T>(T result, ManualResetCoroutineCompletionSource<T> completionSource) : AbstractCoroutineArgumentReceiverAcceptor
+file class CoroutineArgumentReceiverAcceptor<T>(T value, ManualResetCoroutineCompletionSource<T> completionSource) : AbstractCoroutineArgumentReceiverAcceptor
 {
     protected override void AcceptCoroutineArgumentReceiver(ref CoroutineArgumentReceiver argumentReceiver)
     {
-        var argument = new ExchangeArgument<T>(result);
+        var argument = new ExchangeArgument<T>(value);
         argumentReceiver.ReceiveCallableArgument(in ExchangeKey, in argument, completionSource);
     }
 }
@@ -22,15 +22,15 @@ partial class Yielders
     partial class Arguments
     {
         [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly struct ExchangeArgument<T>(T result) : ICallableArgument<ManualResetCoroutineCompletionSource<T>>
+        public readonly struct ExchangeArgument<T>(T value) : ICallableArgument<ManualResetCoroutineCompletionSource<T>>
         {
-            public T Result {
+            public T Value {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get => result;
+                get => value;
             }
 
             void ICallableArgument<ManualResetCoroutineCompletionSource<T>>.Callback(in CoroutineContext context, ManualResetCoroutineCompletionSource<T> completionSource) =>
-                completionSource.SetResult(Result);
+                completionSource.SetResult(Value);
         }
     }
 }

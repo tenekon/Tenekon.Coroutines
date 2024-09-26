@@ -411,8 +411,8 @@ namespace Tenekon.Coroutines.Iterators
             public static readonly Tenekon.Coroutines.Key ExchangeKey;
             public readonly struct ExchangeArgument<T> : Tenekon.Coroutines.ICallableArgument, Tenekon.Coroutines.ICallableArgument<Tenekon.Coroutines.ManualResetCoroutineCompletionSource<T>>
             {
-                public ExchangeArgument(T result) { }
-                public T Result { get; }
+                public ExchangeArgument(T value) { }
+                public T Value { get; }
             }
         }
     }

@@ -106,7 +106,7 @@ var iterator = AsyncIterator.Create(asnyc () => {
 
 while (await iterator.MoveNextAsync()) {
   if (iterator.CurrentKey == ExchangeKey) {
-    Console.WriteLine(((CallArgument<string>)iterator.Current).Closure);
+    Console.WriteLine(((ExchangeArgument<string>)iterator.Current).Value);
     iterator.YieldReturn("Hello iterator");
   }
 }
