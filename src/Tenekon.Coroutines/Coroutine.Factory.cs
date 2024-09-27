@@ -36,7 +36,7 @@ partial struct Coroutine
     private static Coroutine StartInternal<TClosure>(Delegate provider, TClosure closure, in CoroutineContext contextToBequest, bool isProviderWithClosure)
     {
         if (provider is null) {
-            new ArgumentNullException(nameof(provider));
+            throw new ArgumentNullException(nameof(provider));
         }
         Coroutine coroutine;
         if (isProviderWithClosure) {
@@ -51,7 +51,7 @@ partial struct Coroutine
     private static Coroutine<TResult> StartInternal<TClosure, TResult>(Delegate provider, TClosure closure, in CoroutineContext contextToBequest, bool isProviderWithClosure)
     {
         if (provider is null) {
-            new ArgumentNullException(nameof(provider));
+            throw new ArgumentNullException(nameof(provider));
         }
         Coroutine<TResult> coroutine;
         if (isProviderWithClosure) {

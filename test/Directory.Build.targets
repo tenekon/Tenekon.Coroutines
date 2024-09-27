@@ -5,13 +5,6 @@
     <UseTestConvention Condition="'$(IsTestProject)' == 'true' OR '$(UseTestConvention)' == 'true'">true</UseTestConvention>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(UseTestConvention)' == 'true'">
-    <PackageReference Include="Kenet.CSharp.Conventions.Test">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
   <ItemGroup Condition="'$(IsTestProject)' == 'true'">
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="Moq" />
