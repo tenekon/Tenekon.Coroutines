@@ -396,7 +396,7 @@ public abstract class AbstractRobinHoodHashMap<TKey, TValue> : IEnumerable<KeyVa
         do {
             //validate hash en compare keys
             if (_keyEqualityComparer(key, Find(_entries, index).Key)) {
-                uint nextIndex = index + 1;
+                var nextIndex = index + 1;
                 var nextMeta = Find(_meta, nextIndex);
 
                 while (nextMeta > 1) {
@@ -572,7 +572,7 @@ public abstract class AbstractRobinHoodHashMap<TKey, TValue> : IEnumerable<KeyVa
         public TKey Key = key;
         public TValue Value = value;
 
-        public override string ToString() => $$"""Entry{Key={{Key}}, Value={{Value}}}""";
+        public override readonly string ToString() => $$"""Entry{Key={{Key}}, Value={{Value}}}""";
     }
 
     private static class Exceptions

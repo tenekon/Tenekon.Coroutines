@@ -1,6 +1,25 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
     <RootNamespace></RootNamespace>
   </PropertyGroup>
+	<ItemGroup>
+		<InternalsVisibleTo Include="Tenekon.Coroutines"/>
+	</ItemGroup>
+	<Choose>
+		<When Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)','net6.0'))">
+			<ItemGroup>
+				<Compile Remove="System\Diagnostics\CodeAnalysis\DynamicallyAccessedMembersAttribute.cs" />
+				<Compile Remove="System\Diagnostics\CodeAnalysis\DynamicallyAccessedMemberTypes.cs" />
+				<Compile Remove="System\Diagnostics\CodeAnalysis\UnconditionalSuppressMessageAttribute.cs" />
+			</ItemGroup>
+		</When>
+	</Choose>
+	<Choose>
+		<When Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)','net7.0'))">
+			<ItemGroup>
+				<Compile Remove="System\Diagnostics\CodeAnalysis\RequiresDynamicCodeAttribute.cs" />
+			</ItemGroup>
+		</When>
+	</Choose>
 </Project>

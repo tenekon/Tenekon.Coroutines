@@ -7,9 +7,9 @@ using static Tenekon.Coroutines.Benchmark.Infrastructure.CoroutineArgumentReceiv
 
 namespace Tenekon.Coroutines.Benchmark.Infrastructure;
 
-internal class CoroutineArgumentReceiverCachedDelegateFactory {
-    private static readonly ConcurrentDictionary<MethodInfo, Func<Tuple<object, object, object, object>, CoroutineArgumentReceiverDelegate>> _cache
-       = new ConcurrentDictionary<MethodInfo, Func<Tuple<object, object, object, object>, CoroutineArgumentReceiverDelegate>>();
+internal class CoroutineArgumentReceiverCachedDelegateFactory
+{
+    private static readonly ConcurrentDictionary<MethodInfo, Func<Tuple<object, object, object, object>, CoroutineArgumentReceiverDelegate>> s_cache = new();
 
     public static CoroutineArgumentReceiverDelegate CreateDelegate<T1, T2, T3, T4>(
         T1 value1,
@@ -20,7 +20,7 @@ internal class CoroutineArgumentReceiverCachedDelegateFactory {
     {
         var closure = System.Tuple.Create<object, object, object, object>(value1, value2, value3, value4);
         var methodInfo = argumentReceiver.Method;
-        var factory = _cache.GetOrAdd(methodInfo, CreateFactory<T1, T2, T3, T4>(methodInfo));
+        var factory = s_cache.GetOrAdd(methodInfo, CreateFactory<T1, T2, T3, T4>(methodInfo));
         return factory(closure);
     }
 
