@@ -32,5 +32,7 @@ public sealed partial class Yielders
         public readonly static Key YieldReturnKey = new(s_scope, 5);
         public readonly static Key ThrowKey = new(s_scope, 6);
         public readonly static Key YieldKey = new(s_scope, 7);
+        public readonly static Key ExchangeKey = new(s_scope, 8);
+        public readonly static Key YieldReturnVariantKey = new(s_scope, 9);
     }
 }

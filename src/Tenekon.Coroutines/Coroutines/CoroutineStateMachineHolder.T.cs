@@ -215,7 +215,7 @@ internal sealed class CoroutineStateMachineHolder<TResult, [DAM(StateMachineMemb
 
     void IAsyncIteratorStateMachineHolder<TResult>.SetException(Exception e) => _valueTaskSource._valueTaskSource.SetException(e);
 
-    IAsyncIteratorStateMachineHolder<Nothing> IAsyncIteratorStateMachineHolder.CreateNewByCloningUnderlyingStateMachine(
+    IAsyncIteratorStateMachineHolder<VoidCoroutineResult> IAsyncIteratorStateMachineHolder.CreateNewByCloningUnderlyingStateMachine(
         in SuspensionPoint ourSuspensionPoint,
         ref SuspensionPoint theirSuspensionPoint)
     {

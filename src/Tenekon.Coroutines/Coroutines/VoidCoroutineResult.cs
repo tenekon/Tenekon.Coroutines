@@ -1,5 +1,5 @@
 ﻿namespace Tenekon.Coroutines;
 
-internal struct Nothing
+public struct VoidCoroutineResult
 {
 }

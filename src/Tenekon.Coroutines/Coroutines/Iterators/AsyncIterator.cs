@@ -8,11 +8,11 @@ public static class AsyncIterator
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IAsyncIterator Create(Func<Coroutine> provider, in CoroutineContext additiveContext = default, bool isCloneable = false) =>
-        new AsyncIteratorImpl<Nothing>(provider, in additiveContext, isCloneable: isCloneable);
+        new AsyncIteratorImpl<VoidCoroutineResult>(provider, in additiveContext, isCloneable: isCloneable);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IAsyncIterator Create(Coroutine coroutine, in CoroutineContext additiveContext = default, bool isCloneable = false) =>
-        new AsyncIteratorImpl<Nothing>(coroutine, in additiveContext, isCloneable: isCloneable);
+        new AsyncIteratorImpl<VoidCoroutineResult>(coroutine, in additiveContext, isCloneable: isCloneable);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IAsyncIterator<TResult> Create<TResult>(Func<Coroutine<TResult>> provider, in CoroutineContext additiveContext = default, bool isCloneable = false) =>

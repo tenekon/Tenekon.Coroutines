@@ -3,7 +3,7 @@
 internal static class CoroutineAwaiterExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void DelegateCompletion(this Task task, IValueTaskCompletionSource<Nothing> completionSource)
+    internal static void DelegateCompletion(this Task task, IValueTaskCompletionSource<VoidCoroutineResult> completionSource)
     {
         var taskAwaiter = task.ConfigureAwait(false).GetAwaiter();
 
@@ -14,7 +14,7 @@ internal static class CoroutineAwaiterExtensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static void CompleteSource(in ConfiguredTaskAwaitable.ConfiguredTaskAwaiter taskAwaiter, IValueTaskCompletionSource<Nothing> completionSource)
+        static void CompleteSource(in ConfiguredTaskAwaitable.ConfiguredTaskAwaiter taskAwaiter, IValueTaskCompletionSource<VoidCoroutineResult> completionSource)
         {
             try {
                 taskAwaiter.GetResult();
@@ -51,7 +51,7 @@ internal static class CoroutineAwaiterExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void DelegateCoroutineCompletion<TAwaiter>(this ref TAwaiter coroutineAwaiter, IValueTaskCompletionSource<Nothing> completionSource)
+    internal static void DelegateCoroutineCompletion<TAwaiter>(this ref TAwaiter coroutineAwaiter, IValueTaskCompletionSource<VoidCoroutineResult> completionSource)
         where TAwaiter : struct, ICriticalNotifyCompletion, ICoroutineAwaiter
     {
         if (coroutineAwaiter.IsCompleted) {
@@ -62,7 +62,7 @@ internal static class CoroutineAwaiterExtensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static void CompleteSource(in TAwaiter coroutineAwaiter, IValueTaskCompletionSource<Nothing> completionSource)
+        static void CompleteSource(in TAwaiter coroutineAwaiter, IValueTaskCompletionSource<VoidCoroutineResult> completionSource)
         {
             try {
                 coroutineAwaiter.GetResult();

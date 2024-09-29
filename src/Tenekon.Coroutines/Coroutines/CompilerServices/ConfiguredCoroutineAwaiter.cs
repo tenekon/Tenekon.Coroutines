@@ -45,7 +45,7 @@ public struct ConfiguredCoroutineAwaiter : ICriticalNotifyCompletion, IRelativeC
         IAsyncIteratorStateMachineHolder theirStateMachineHolder,
         in SuspensionPoint ourSuspensionPoint,
         ref SuspensionPoint theirSuspensionPoint) =>
-        CoroutineAwaiterCore.RenewStateMachineCoroutineAwaiter<TStateMachine, ConfiguredCoroutineAwaiter, ConfiguredValueTaskAwaitable.ConfiguredValueTaskAwaiter, ValueTaskAccessor, Nothing>(
+        CoroutineAwaiterCore.RenewStateMachineCoroutineAwaiter<TStateMachine, ConfiguredCoroutineAwaiter, ConfiguredValueTaskAwaitable.ConfiguredValueTaskAwaiter, ValueTaskAccessor, VoidCoroutineResult>(
             theirStateMachineHolder,
             in ourSuspensionPoint,
             ref theirSuspensionPoint,

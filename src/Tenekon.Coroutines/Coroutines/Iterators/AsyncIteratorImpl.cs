@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Tenekon.Coroutines.CompilerServices;
+using Tenekon.Coroutines.Sources;
 
 namespace Tenekon.Coroutines.Iterators;
 
@@ -219,7 +220,7 @@ internal partial class AsyncIteratorImpl<TResult> : IAsyncIterator<TResult>, IAs
                 if ((_nextSuspensionPoint._state & SuspensionPointState.ArgumentSupplied) != 0) {
                     iteratorContext._iteratorContextService._currentSuspensionPoint.RequireAwaiterCompletionNotifier();
                     Debug.Assert(_nextSuspensionPoint._argumentCompletionSource is not null);
-                    _nextSuspensionPoint._argumentCompletionSource.SetResult(default(Nothing)); // ISSUE: hard assumption
+                    _nextSuspensionPoint._argumentCompletionSource.SetResult(default(VoidCoroutineResult)); // ISSUE: hard assumption
                     iteratorContext._coroutineStateMachineHolder?.MoveNext();
                 }
             } finally {
@@ -351,9 +352,9 @@ internal partial class AsyncIteratorImpl<TResult> : IAsyncIterator<TResult>, IAs
             var theirIteratorContextService = new AsyncIteratorContextService(in SuspensionPoint.AwaiterCompletionNotifierRequired, isAsyncIteratorCloneable: true);
             var theirStateMachineHolder = ourStateMachineHolder.CreateNewByCloningUnderlyingStateMachine(in _nextSuspensionPoint, ref theirIteratorContextService._currentSuspensionPoint);
             theirStateMachineHolder.CoroutineContext = ourIteratorContext._iteratorAgnosticCoroutineContext;
-            var theirIterator = new AsyncIteratorImpl<Nothing>(new Coroutine(theirStateMachineHolder, theirStateMachineHolder.Version), _additiveContext, isCloneable: true);
+            var theirIterator = new AsyncIteratorImpl<VoidCoroutineResult>(new Coroutine(theirStateMachineHolder, theirStateMachineHolder.Version), _additiveContext, isCloneable: true);
             { // Initialize their iterator
-                var theirIteratorContext = new AsyncIteratorImpl<Nothing>.AsyncIteratorContext(theirIteratorContextService) {
+                var theirIteratorContext = new AsyncIteratorImpl<VoidCoroutineResult>.AsyncIteratorContext(theirIteratorContextService) {
                     _iteratorAgnosticCoroutineContext = ourIteratorContext._iteratorAgnosticCoroutineContext,
                     _coroutineStateMachineHolder = theirStateMachineHolder,
                     _coroutineAwaiter = theirIterator._coroutineHolder.Coroutine.GetAwaiter()

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Threading.Tasks.Sources;
 
-namespace Tenekon.Coroutines;
+namespace Tenekon.Coroutines.Sources;
 
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.

@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 
 namespace Tenekon.Coroutines.Benchmark
 {
     [MemoryDiagnoser]
-    [MediumRunJob]
+    [ShortRunJob]
     public class AsyncIteratorBenchmark
     {
         private const int RunLess = 9;
@@ -23,7 +24,30 @@ namespace Tenekon.Coroutines.Benchmark
             var results = new List<int>();
 
             while (await generator.MoveNextAsync()) {
-                results.Add(((YieldReturnArgument<int>)generator.Current).Value);
+                results.Add(Unsafe.As<YieldReturnArgument<int>>(generator.Current).Value);
+            }
+
+            static async Coroutine Generator(int runs)
+            {
+                var run = runs;
+                while (run-- > 0) {
+                    await YieldReturn(run);
+                    await Task.Yield();
+                }
+            }
+        }
+
+        [Benchmark]
+        [Arguments(RunLess)]
+        [Arguments(RunMore)]
+        [Arguments(RunMost)]
+        public async Task CloeableAsyncIterator(int runs)
+        {
+            var generator = Generator(runs).GetAsyncIterator(isCloneable: true);
+            var results = new List<int>();
+
+            while (await generator.MoveNextAsync()) {
+                results.Add(Unsafe.As<YieldReturnArgument<int>>(generator.Current).Value);
             }
 
             static async Coroutine Generator(int runs)

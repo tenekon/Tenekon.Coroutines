@@ -75,7 +75,7 @@ internal static class CoroutineMethodBuilderCore
         where TCoroutineAwaiter : struct, ICriticalNotifyCompletion, ICoroutineAwaiter
     {
         Debug.Assert(contextToBequest.BequesterOrigin == CoroutineContextBequesterOrigin.ChildCoroutine);
-        var stateMachineHolder = CoroutineStateMachineHolder<Nothing, CoroutineAwaiterStateMachine<CoroutineAwaiterMethodBuilder<TCoroutineAwaiter>>>.RentFromCache();
+        var stateMachineHolder = CoroutineStateMachineHolder<VoidCoroutineResult, CoroutineAwaiterStateMachine<CoroutineAwaiterMethodBuilder<TCoroutineAwaiter>>>.RentFromCache();
         var coroutineBuilder = new CoroutineAwaiterMethodBuilder<TCoroutineAwaiter>(in coroutineAwaiter, stateMachineHolder);
         var stateMachine = new CoroutineAwaiterStateMachine<CoroutineAwaiterMethodBuilder<TCoroutineAwaiter>>(coroutineBuilder) {
             _state = -1

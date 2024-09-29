@@ -1,4 +1,4 @@
-﻿namespace Tenekon.Coroutines;
+﻿namespace Tenekon.Coroutines.Sources;
 
 internal static class ManualResetCoroutineCompletionSourceExtensions
 {

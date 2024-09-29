@@ -7,8 +7,8 @@ public static partial class Yielders
 {
     public partial class Arguments
     {
-        internal readonly static Key ChannelKey = new(Encoding.ASCII.GetBytes("__co/rx"), 1);
-        internal readonly static Key TakeKey = new(Encoding.ASCII.GetBytes("__co/rx"), 2);
-        internal readonly static Key EmitKey = new(Encoding.ASCII.GetBytes("__co/rx"), 3);
+        public readonly static Key ChannelKey = new(Encoding.ASCII.GetBytes("__co/rx"), 1);
+        public readonly static Key TakeKey = new(Encoding.ASCII.GetBytes("__co/rx"), 2);
+        public readonly static Key EmitKey = new(Encoding.ASCII.GetBytes("__co/rx"), 3);
     }
 }

@@ -20,13 +20,13 @@ internal interface ICoroutineAwaiterMethodBuilder<TResult>
 
 internal readonly struct CoroutineAwaiterMethodBuilder<TCoroutineAwaiter>(
     in TCoroutineAwaiter awaiter,
-    CoroutineStateMachineHolder<Nothing, CoroutineAwaiterStateMachine<CoroutineAwaiterMethodBuilder<TCoroutineAwaiter>>> stateMachineHolder) : ICoroutineAwaiterMethodBuilder
+    CoroutineStateMachineHolder<VoidCoroutineResult, CoroutineAwaiterStateMachine<CoroutineAwaiterMethodBuilder<TCoroutineAwaiter>>> stateMachineHolder) : ICoroutineAwaiterMethodBuilder
     where TCoroutineAwaiter : struct, ICriticalNotifyCompletion, ICoroutineAwaiter
 {
     public readonly bool IsCompleted => _awaiter.IsCompleted;
 
     public readonly TCoroutineAwaiter _awaiter = awaiter;
-    public readonly CoroutineStateMachineHolder<Nothing,CoroutineAwaiterStateMachine<CoroutineAwaiterMethodBuilder<TCoroutineAwaiter>>> _stateMachineHolder = stateMachineHolder;
+    public readonly CoroutineStateMachineHolder<VoidCoroutineResult,CoroutineAwaiterStateMachine<CoroutineAwaiterMethodBuilder<TCoroutineAwaiter>>> _stateMachineHolder = stateMachineHolder;
 
     public readonly void AwaitUnsafeOnCompleted() => _awaiter.UnsafeOnCompleted(_stateMachineHolder.MoveNextAction);
 

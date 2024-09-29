@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks.Sources;
 
-namespace Tenekon.Coroutines;
+namespace Tenekon.Coroutines.Sources;
 
 internal struct ManualResetValueTaskSourceProxy<TResult>
 {

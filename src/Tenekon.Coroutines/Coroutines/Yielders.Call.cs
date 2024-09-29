@@ -1,72 +1,90 @@
-﻿using static Tenekon.Coroutines.Yielders.Arguments;
+﻿using System.Diagnostics;
+using Tenekon.Coroutines.Sources;
+using static Tenekon.Coroutines.Yielders.Arguments;
 
 namespace Tenekon.Coroutines;
-
-file class CoroutineArgumentReceiverAcceptor<TClosure>(Delegate provider, TClosure closure, bool isProviderWithClosure, ManualResetCoroutineCompletionSource<Nothing> completionSource) : AbstractCoroutineArgumentReceiverAcceptor
-{
-    protected override void AcceptCoroutineArgumentReceiver(ref CoroutineArgumentReceiver argumentReceiver)
-    {
-        var argument = new CallArgument<TClosure>(provider, closure, isProviderWithClosure);
-        argumentReceiver.ReceiveCallableArgument(in CallKey, in argument, completionSource);
-    }
-}
-
-file class CoroutineArgumentReceiverAcceptor<TClosure, TResult>(Delegate provider, TClosure closure, bool isProviderWithClosure, ManualResetCoroutineCompletionSource<TResult> completionSource) : AbstractCoroutineArgumentReceiverAcceptor
-{
-    protected override void AcceptCoroutineArgumentReceiver(ref CoroutineArgumentReceiver argumentReceiver)
-    {
-        var argument = new CallArgument<TClosure, TResult>(provider, closure, isProviderWithClosure);
-        argumentReceiver.ReceiveCallableArgument(in CallKey, in argument, completionSource);
-    }
-}
 
 partial class Yielders
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static Coroutine CallInternal<TClosure>(Delegate provider, TClosure closure, bool isProviderWithClosure)
+    internal static Coroutine<VoidCoroutineResult> CallInternal<TClosure>(Delegate provider, TClosure closure, CoroutineProviderFlags providerFlags)
     {
-        var completionSource = ManualResetCoroutineCompletionSource<Nothing>.RentFromCache();
-        return new Coroutine(completionSource.CreateValueTask(), new CoroutineArgumentReceiverAcceptor<TClosure>(provider, closure, isProviderWithClosure, completionSource));
+        var completionSource = ManualResetCoroutineCompletionSource<VoidCoroutineResult>.RentFromCache();
+        var argument = new CallArgument<TClosure>(provider, closure, providerFlags, completionSource);
+        return new Coroutine<VoidCoroutineResult>(completionSource, argument);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static Coroutine<TResult> CallInternal<TClosure, TResult>(Delegate provider, TClosure closure, bool isProviderWithClosure)
+    internal static Coroutine<TResult> CallInternal<TClosure, TResult>(Delegate provider, TClosure closure, CoroutineProviderFlags providerFlags)
     {
         var completionSource = ManualResetCoroutineCompletionSource<TResult>.RentFromCache();
-        return new Coroutine<TResult>(completionSource.CreateGenericValueTask(), new CoroutineArgumentReceiverAcceptor<TClosure, TResult>(provider, closure, isProviderWithClosure, completionSource));
+        var argument = new CallArgument<TClosure, TResult>(provider, closure, providerFlags, completionSource);
+        return new Coroutine<TResult>(completionSource, argument);
     }
 
-    public static Coroutine Call(Func<Coroutine> provider) => CallInternal<object?>(provider, closure: null, isProviderWithClosure: false);
+    public static Coroutine<VoidCoroutineResult> Call(Func<Coroutine> provider) => CallInternal<object?>(provider, closure: null, CoroutineProviderFlags.None);
 
-    public static Coroutine Call<TClosure>(Func<TClosure, Coroutine> provider, TClosure closure) => CallInternal(provider, closure, isProviderWithClosure: true);
+    public static Coroutine<VoidCoroutineResult> Call<TClosure>(Func<TClosure, Coroutine> provider, TClosure closure) => CallInternal(provider, closure, CoroutineProviderFlags.RequiresClosure);
 
-    public static Coroutine<TResult> Call<TResult>(Func<Coroutine<TResult>> provider) => CallInternal<object?, TResult>(provider, closure: null, isProviderWithClosure: false);
+    public static Coroutine<TResult> Call<TResult>(Func<Coroutine<TResult>> provider) => CallInternal<object?, TResult>(provider, closure: null, CoroutineProviderFlags.None);
 
-    public static Coroutine<TResult> Call<TClosure, TResult>(Func<TClosure, Coroutine<TResult>> provider, TClosure closure) => CallInternal<TClosure, TResult>(provider, closure, isProviderWithClosure: true);
+    public static Coroutine<TResult> Call<TClosure, TResult>(Func<TClosure, Coroutine<TResult>> provider, TClosure closure) => CallInternal<TClosure, TResult>(provider, closure, CoroutineProviderFlags.RequiresClosure);
 
     partial class Arguments
     {
-        public readonly struct CallArgument<TClosure>(Delegate provider, TClosure closure, bool isProviderWithClosure) : ICallableArgument<ManualResetCoroutineCompletionSource<Nothing>>
+        [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal readonly struct CallArgumentCore<TClosure, TResult>(Delegate provider, TClosure closure, CoroutineProviderFlags providerFlags, ManualResetCoroutineCompletionSource<TResult>? completionSource)
         {
+            internal readonly ManualResetCoroutineCompletionSource<TResult>? _completionSource = completionSource;
+
+            public readonly Delegate Provider = provider;
+            public readonly TClosure Closure = closure;
+            public readonly CoroutineProviderFlags ProviderFlags = providerFlags;
+
+            public override int GetHashCode()
+            {
+                var code = new HashCode();
+                code.Add(Provider);
+                code.Add(Closure);
+                code.Add(ProviderFlags);
+                return code.ToHashCode();
+            }
+
+            public bool Equals(in CallArgumentCore<TClosure, TResult> other) =>
+                ReferenceEquals(Provider, other.Provider)
+                && Equals(Closure, other.Closure)
+                && ProviderFlags == other.ProviderFlags;
+        }
+
+        public class CallArgument<TClosure> : ICallableArgument<ManualResetCoroutineCompletionSource<VoidCoroutineResult>>, ISiblingCoroutine
+        {
+            internal readonly CallArgumentCore<TClosure, VoidCoroutineResult> _core;
+
             public Delegate Provider {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get => provider;
+                get => _core.Provider;
             }
 
             public TClosure Closure {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get => closure;
+                get => _core.Closure;
             }
 
-            public bool IsProviderWithClosure {
+            public CoroutineProviderFlags ProviderFlags {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get => isProviderWithClosure;
+                get => _core.ProviderFlags;
             }
 
-            readonly void ICallableArgument<ManualResetCoroutineCompletionSource<Nothing>>.Callback(in CoroutineContext context, ManualResetCoroutineCompletionSource<Nothing> completionSource)
+            internal CallArgument(Delegate provider, TClosure closure, CoroutineProviderFlags providerFlags, ManualResetCoroutineCompletionSource<VoidCoroutineResult> completionSource) =>
+                _core = new CallArgumentCore<TClosure, VoidCoroutineResult>(provider, closure, providerFlags, completionSource);
+
+            public CallArgument(Delegate provider, TClosure closure, CoroutineProviderFlags providerFlags) =>
+                _core = new CallArgumentCore<TClosure, VoidCoroutineResult>(provider, closure, providerFlags, completionSource: null);
+
+            void ICallableArgument<ManualResetCoroutineCompletionSource<VoidCoroutineResult>>.Callback(in CoroutineContext context, ManualResetCoroutineCompletionSource<VoidCoroutineResult> completionSource)
             {
                 Coroutine coroutine;
-                if (IsProviderWithClosure) {
+                if ((_core.ProviderFlags & CoroutineProviderFlags.RequiresClosure) != 0) {
                     coroutine = Unsafe.As<Func<TClosure, Coroutine>>(Provider)(Closure);
                 } else {
                     coroutine = Unsafe.As<Func<Coroutine>>(Provider)();
@@ -80,18 +98,50 @@ partial class Yielders
                 CoroutineMethodBuilderCore.ActOnCoroutine(ref coroutineAwaiter, in contextToBequest);
                 coroutineAwaiter.DelegateCoroutineCompletion(completionSource);
             }
+
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver)
+            {
+                if (_core._completionSource is null) {
+                    throw new InvalidOperationException();
+                }
+                argumentReceiver.ReceiveCallableArgument(in CallKey, this, _core._completionSource);
+            }
+
+            public override bool Equals([AllowNull] object obj) => obj is CallArgument<TClosure> argument && _core.Equals(in argument._core);
+
+            public override int GetHashCode() => _core.GetHashCode();
         }
 
-        public readonly struct CallArgument<TClosure, TResult>(Delegate provider, TClosure closure, bool isProviderWithClosure) : ICallableArgument<ManualResetCoroutineCompletionSource<TResult>>
+        public class CallArgument<TClosure, TResult> : ICallableArgument<ManualResetCoroutineCompletionSource<TResult>>, ISiblingCoroutine
         {
-            public Delegate Provider { get; } = provider;
-            public TClosure Closure { get; } = closure;
-            public bool IsProviderWithClosure { get; } = isProviderWithClosure;
+            private readonly CallArgumentCore<TClosure, TResult> _core;
+
+            public Delegate Provider {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                get => _core.Provider;
+            }
+
+            public TClosure Closure {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                get => _core.Closure;
+            }
+
+            public CoroutineProviderFlags ProviderFlags {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                get => _core.ProviderFlags;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal CallArgument(Delegate provider, TClosure closure, CoroutineProviderFlags providerFlags, ManualResetCoroutineCompletionSource<TResult> completionSource) =>
+                _core = new CallArgumentCore<TClosure, TResult>(provider, closure, providerFlags, completionSource);
+
+            public CallArgument(Delegate provider, TClosure closure, CoroutineProviderFlags providerFlags) =>
+                _core = new CallArgumentCore<TClosure, TResult>(provider, closure, providerFlags, completionSource: null);
 
             void ICallableArgument<ManualResetCoroutineCompletionSource<TResult>>.Callback(in CoroutineContext context, ManualResetCoroutineCompletionSource<TResult> completionSource)
             {
                 Coroutine<TResult> coroutine;
-                if (IsProviderWithClosure) {
+                if ((_core.ProviderFlags & CoroutineProviderFlags.RequiresClosure) != 0) {
                     coroutine = Unsafe.As<Func<TClosure, Coroutine<TResult>>>(Provider)(Closure);
                 } else {
                     coroutine = Unsafe.As<Func<Coroutine<TResult>>>(Provider)();
@@ -105,6 +155,16 @@ partial class Yielders
                 CoroutineMethodBuilderCore.ActOnCoroutine(ref coroutineAwaiter, in contextToBequest);
                 coroutineAwaiter.DelegateCoroutineCompletion(completionSource);
             }
+
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver)
+            {
+                Debug.Assert(_core._completionSource is not null);
+                argumentReceiver.ReceiveCallableArgument(in CallKey, this, _core._completionSource);
+            }
+
+            public override bool Equals([AllowNull] object obj) => obj is CallArgument<TClosure, TResult> argument && _core.Equals(in argument._core);
+
+            public override int GetHashCode() => _core.GetHashCode();
         }
     }
 }

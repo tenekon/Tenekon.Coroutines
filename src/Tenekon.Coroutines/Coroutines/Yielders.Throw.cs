@@ -1,36 +1,60 @@
-﻿namespace Tenekon.Coroutines;
-
+﻿using System.Diagnostics;
+using Tenekon.Coroutines.Sources;
 using static Tenekon.Coroutines.Yielders.Arguments;
 
-file class CoroutineArgumentReceiverAcceptor(Exception exception, ManualResetCoroutineCompletionSource<Nothing> completionSource) : AbstractCoroutineArgumentReceiverAcceptor
-{
-    protected override void AcceptCoroutineArgumentReceiver(ref CoroutineArgumentReceiver argumentReceiver)
-    {
-        var argument = new ThrowArgument(exception);
-        argumentReceiver.ReceiveCallableArgument(in ThrowKey, in argument, completionSource);
-    }
-}
+namespace Tenekon.Coroutines;
 
 partial class Yielders
 {
     public static Coroutine Throw(Exception exception)
     {
-        var completionSource = ManualResetCoroutineCompletionSource<Nothing>.RentFromCache();
-        return new Coroutine(completionSource.CreateValueTask(), new CoroutineArgumentReceiverAcceptor(exception, completionSource));
+        var completionSource = ManualResetCoroutineCompletionSource<VoidCoroutineResult>.RentFromCache();
+        var argument = new ThrowArgument(exception, completionSource);
+        return new Coroutine(completionSource, argument);
     }
 
     partial class Arguments
     {
         [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal readonly struct ThrowArgument(Exception exception) : ICallableArgument<ManualResetCoroutineCompletionSource<Nothing>>
+        internal readonly struct ThrowArgumentCore(Exception exception, ManualResetCoroutineCompletionSource<VoidCoroutineResult>? completionSource)
         {
+            internal readonly ManualResetCoroutineCompletionSource<VoidCoroutineResult>? _completionSource = completionSource;
+
+            public readonly Exception Exception = exception;
+
+            public bool Equals(in ThrowArgumentCore other) => Equals(Exception, other.Exception);
+
+            public readonly override int GetHashCode() => Exception.GetHashCode();
+        }
+
+        public class ThrowArgument : ICallableArgument<ManualResetCoroutineCompletionSource<VoidCoroutineResult>>, ISiblingCoroutine
+        {
+            private readonly ThrowArgumentCore _core;
+
             public Exception Exception {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get => exception;
+                get => _core.Exception;
             }
 
-            void ICallableArgument<ManualResetCoroutineCompletionSource<Nothing>>.Callback(in CoroutineContext context, ManualResetCoroutineCompletionSource<Nothing> completionSource) =>
-                completionSource.SetException(Exception);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal ThrowArgument(Exception exception, ManualResetCoroutineCompletionSource<VoidCoroutineResult> completionSource) => _core = new(exception, completionSource);
+
+            public ThrowArgument(Exception exception) => _core = new(exception, completionSource: null);
+
+            public ThrowArgument() { }
+
+            void ICallableArgument<ManualResetCoroutineCompletionSource<VoidCoroutineResult>>.Callback(in CoroutineContext context, ManualResetCoroutineCompletionSource<VoidCoroutineResult> completionSource) =>
+                completionSource.SetException(_core.Exception);
+
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver)
+            {
+                Debug.Assert(_core._completionSource is not null);
+                argumentReceiver.ReceiveCallableArgument(in ThrowKey, this, _core._completionSource);
+            }
+
+            public override bool Equals([AllowNull] object obj) => obj is ThrowArgument other && _core.Equals(in other._core);
+
+            public override int GetHashCode() => 0;
         }
     }
 }

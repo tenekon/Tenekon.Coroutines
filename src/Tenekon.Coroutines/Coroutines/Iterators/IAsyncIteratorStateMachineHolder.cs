@@ -6,7 +6,7 @@ internal interface IAsyncIteratorStateMachineHolder : ICoroutineStateMachineHold
 {
     short Version { get; }
 
-    IAsyncIteratorStateMachineHolder<Nothing> CreateNewByCloningUnderlyingStateMachine(in SuspensionPoint ourSuspensionPoint, ref SuspensionPoint theirSuspensionPoint);
+    IAsyncIteratorStateMachineHolder<VoidCoroutineResult> CreateNewByCloningUnderlyingStateMachine(in SuspensionPoint ourSuspensionPoint, ref SuspensionPoint theirSuspensionPoint);
 }
 
 internal interface IAsyncIteratorStateMachineHolder<TResult> : IAsyncIteratorStateMachineHolder, ICoroutineStateMachineHolder<TResult>, IValueTaskSource<TResult>

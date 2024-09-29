@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Tenekon.Coroutines.Sources;
 
 namespace Tenekon.Coroutines;
 
@@ -53,7 +54,7 @@ public struct CoroutineContext : IEquatable<CoroutineContext>
     internal int _identifier;
 #endif
 
-    internal ICoroutineResultStateMachineHolder ResultStateMachine => _resultStateMachine ??= CoroutineStateMachineHolder<Nothing>.s_synchronousSuccessSentinel;
+    internal ICoroutineResultStateMachineHolder ResultStateMachine => _resultStateMachine ??= CoroutineStateMachineHolder<VoidCoroutineResult>.s_synchronousSuccessSentinel;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]

@@ -1,4 +1,6 @@
-﻿namespace Tenekon.Coroutines.Iterators;
+﻿using Tenekon.Coroutines.Sources;
+
+namespace Tenekon.Coroutines.Iterators;
 
 internal struct SuspensionPoint
 {
@@ -30,11 +32,11 @@ internal struct SuspensionPoint
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void BeginSupplyingAwaiterCompletionNotifier(out ManualResetCoroutineCompletionSource<Nothing> externTaskCompletionNotifierSource)
+    private void BeginSupplyingAwaiterCompletionNotifier(out ManualResetCoroutineCompletionSource<VoidCoroutineResult> externTaskCompletionNotifierSource)
     {
         ThrowIfNotRequiringAwaiterCompletionNotifier(in this);
         _state = SuspensionPointState.AwaiterCompletionNotifierSupplied | (_state & ~SuspensionPointState.AwaiterCompletionNotifierRequired);
-        externTaskCompletionNotifierSource = ManualResetCoroutineCompletionSource<Nothing>.RentFromCache();
+        externTaskCompletionNotifierSource = ManualResetCoroutineCompletionSource<VoidCoroutineResult>.RentFromCache();
         _awaiterCompletionNotifier = externTaskCompletionNotifierSource.CreateValueTask();
     }
 

@@ -76,7 +76,7 @@ public partial struct Coroutine : IRelativeCoroutine, IEquatable<Coroutine>
     public static implicit operator Coroutine(ValueTask task) => new(task);
 
     public readonly IAsyncIterator GetAsyncIterator(in CoroutineContext additiveContext = default, bool isCloneable = false) =>
-        new AsyncIteratorImpl<Nothing>(this, in additiveContext, isCloneable: isCloneable);
+        new AsyncIteratorImpl<VoidCoroutineResult>(this, in additiveContext, isCloneable: isCloneable);
 
     public readonly bool Equals(in Coroutine other) => CoroutineEqualityComparer.Equals(in this, in other);
 
