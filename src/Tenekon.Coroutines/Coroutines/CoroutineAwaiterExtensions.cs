@@ -1,9 +1,11 @@
-﻿namespace Tenekon.Coroutines;
+﻿using Tenekon.Coroutines.Sources;
+
+namespace Tenekon.Coroutines;
 
 internal static class CoroutineAwaiterExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void DelegateCompletion(this Task task, IValueTaskCompletionSource<VoidCoroutineResult> completionSource)
+    internal static void DelegateCompletion(this Task task, ICompletionSource<VoidCoroutineResult> completionSource)
     {
         var taskAwaiter = task.ConfigureAwait(false).GetAwaiter();
 
@@ -14,7 +16,7 @@ internal static class CoroutineAwaiterExtensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static void CompleteSource(in ConfiguredTaskAwaitable.ConfiguredTaskAwaiter taskAwaiter, IValueTaskCompletionSource<VoidCoroutineResult> completionSource)
+        static void CompleteSource(in ConfiguredTaskAwaitable.ConfiguredTaskAwaiter taskAwaiter, ICompletionSource<VoidCoroutineResult> completionSource)
         {
             try {
                 taskAwaiter.GetResult();
@@ -27,7 +29,7 @@ internal static class CoroutineAwaiterExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void DelegateCompletion<TResult>(this ValueTask<TResult> coroutineAwaiter, IValueTaskCompletionSource<TResult> completionSource)
+    internal static void DelegateCompletion<TResult>(this ValueTask<TResult> coroutineAwaiter, ICompletionSource<TResult> completionSource)
     {
         var taskAwaiter = coroutineAwaiter.ConfigureAwait(false).GetAwaiter();
 
@@ -38,7 +40,7 @@ internal static class CoroutineAwaiterExtensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static void CompleteSource(in ConfiguredValueTaskAwaitable<TResult>.ConfiguredValueTaskAwaiter taskAwaiter, IValueTaskCompletionSource<TResult> completionSource)
+        static void CompleteSource(in ConfiguredValueTaskAwaitable<TResult>.ConfiguredValueTaskAwaiter taskAwaiter, ICompletionSource<TResult> completionSource)
         {
             try {
                 var result = taskAwaiter.GetResult();
@@ -51,7 +53,7 @@ internal static class CoroutineAwaiterExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void DelegateCoroutineCompletion<TAwaiter>(this ref TAwaiter coroutineAwaiter, IValueTaskCompletionSource<VoidCoroutineResult> completionSource)
+    internal static void DelegateCoroutineCompletion<TAwaiter>(this ref TAwaiter coroutineAwaiter, ICompletionSource<VoidCoroutineResult> completionSource)
         where TAwaiter : struct, ICriticalNotifyCompletion, ICoroutineAwaiter
     {
         if (coroutineAwaiter.IsCompleted) {
@@ -62,7 +64,7 @@ internal static class CoroutineAwaiterExtensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static void CompleteSource(in TAwaiter coroutineAwaiter, IValueTaskCompletionSource<VoidCoroutineResult> completionSource)
+        static void CompleteSource(in TAwaiter coroutineAwaiter, ICompletionSource<VoidCoroutineResult> completionSource)
         {
             try {
                 coroutineAwaiter.GetResult();
@@ -75,7 +77,7 @@ internal static class CoroutineAwaiterExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static void DelegateCoroutineCompletion<TAwaiter, TResult>(this ref TAwaiter coroutineAwaiter, IValueTaskCompletionSource<TResult> completionSource)
+    internal static void DelegateCoroutineCompletion<TAwaiter, TResult>(this ref TAwaiter coroutineAwaiter, ICompletionSource<TResult> completionSource)
         where TAwaiter : struct, ICriticalNotifyCompletion, ICoroutineAwaiter<TResult>
     {
         if (coroutineAwaiter.IsCompleted) {
@@ -86,7 +88,7 @@ internal static class CoroutineAwaiterExtensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static void CompleteSource(in TAwaiter coroutineAwaiter, IValueTaskCompletionSource<TResult> completionSource)
+        static void CompleteSource(in TAwaiter coroutineAwaiter, ICompletionSource<TResult> completionSource)
         {
             try {
                 var result = coroutineAwaiter.GetResult();

@@ -26,10 +26,7 @@ internal abstract class CoroutineStateMachineHolder<TResult> : IValueTaskSource<
 
     protected CoroutineStateMachineBoxResult<TResult>? _result;
 
-    protected CoroutineStateMachineHolder()
-    {
-        _coroutineContext._bequesterOrigin = CoroutineContextBequesterOrigin.ChildCoroutine;
-    }
+    protected CoroutineStateMachineHolder() => _coroutineContext._bequesterOrigin = CoroutineContextBequesterOrigin.ChildCoroutine;
 
     void IChildCoroutine.ActOnCoroutine(in CoroutineContext contextToBequest)
     {
@@ -39,7 +36,7 @@ internal abstract class CoroutineStateMachineHolder<TResult> : IValueTaskSource<
         Unsafe.As<ICoroutineStateMachineHolder>(this).MoveNext();
     }
 
-    void ICoroutineResultStateMachineHolder.CallbackWhenForkNotifiedCritically<TAwaiter>(ref TAwaiter awaiter, Action continuation) =>
+    void ICoroutineResultStateMachineHolder.RegisterCriticalBackgroundTaskAndNotifyOnCompletion<TAwaiter>(ref TAwaiter awaiter, Action continuation) =>
         throw Exceptions.ImplementedByDerivedType();
 
     /// <summary>Gets the status of the box.</summary>
@@ -112,7 +109,7 @@ internal abstract class CoroutineStateMachineHolder<TResult> : IValueTaskSource<
     {
         public SynchronousSuccessSentinelCoroutineStateMachineBox() => SetResultCore(default!);
 
-        void ICoroutineResultStateMachineHolder.CallbackWhenForkNotifiedCritically<TAwaiter>(ref TAwaiter awaiter, Action continuation) =>
+        void ICoroutineResultStateMachineHolder.RegisterCriticalBackgroundTaskAndNotifyOnCompletion<TAwaiter>(ref TAwaiter awaiter, Action continuation) =>
             awaiter.UnsafeOnCompleted(continuation);
     }
 }

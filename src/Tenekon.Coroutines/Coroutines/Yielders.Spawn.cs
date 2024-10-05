@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Tenekon.Coroutines.CompilerServices;
+﻿using Tenekon.Coroutines.CompilerServices;
 using Tenekon.Coroutines.Sources;
 using static Tenekon.Coroutines.Yielders.Arguments;
 
@@ -12,7 +11,7 @@ partial class Yielders
     {
         var completionSource = ManualResetCoroutineCompletionSource<CoroutineAwaitable>.RentFromCache();
         var argument = new SpawnArgument<TClosure>(provider, closure, providerFlags, completionSource);
-        return new Coroutine<CoroutineAwaitable>(completionSource, argument);
+        return new(completionSource, argument);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -20,7 +19,7 @@ partial class Yielders
     {
         var completionSource = ManualResetCoroutineCompletionSource<CoroutineAwaitable<TResult>>.RentFromCache();
         var argument = new SpawnArgument<TClosure, TResult>(provider, closure, providerFlags, completionSource);
-        return new Coroutine<CoroutineAwaitable<TResult>>(completionSource, argument);
+        return new(completionSource, argument);
     }
 
     public static Coroutine<CoroutineAwaitable> Spawn(Func<Coroutine> provider) => SpawnInternal<object?>(provider, closure: null, CoroutineProviderFlags.None);
@@ -42,14 +41,9 @@ partial class Yielders
             public readonly TClosure Closure = closure;
             public readonly CoroutineProviderFlags ProviderFlags = providerFlags;
 
-            public override int GetHashCode()
-            {
-                var code = new HashCode();
-                code.Add(Provider);
-                code.Add(Closure);
-                code.Add(ProviderFlags);
-                return code.ToHashCode();
-            }
+            public override int GetHashCode() => HashCode.Combine(Provider, Closure, ProviderFlags);
+
+            public override bool Equals([AllowNull] object obj) => throw new NotImplementedException();
 
             public bool Equals(in SpawnArgumentCore<TClosure, TResult> other) =>
                 ReferenceEquals(Provider, other.Provider)
@@ -104,21 +98,15 @@ partial class Yielders
                 }
                 var childCoroutineAwaiter = childCoroutine.ConfigureAwait(false).GetAwaiter();
 
-                var intermediateCompletionSource = ManualResetCoroutineCompletionSource<VoidCoroutineResult>.RentFromCache();
-                childCoroutine._task = intermediateCompletionSource.CreateValueTask();
+                var completionSourceProxy = ManualResetCoroutineCompletionSource<VoidCoroutineResult>.RentFromCache();
+                childCoroutine._task = completionSourceProxy.CreateValueTask();
                 CoroutineMethodBuilderCore.ActOnCoroutine(ref childCoroutineAwaiter, in contextToBequest);
-                childCoroutineAwaiter.DelegateCoroutineCompletion(intermediateCompletionSource);
+                childCoroutineAwaiter.DelegateCoroutineCompletion(completionSourceProxy);
                 childCoroutine.MarkCoroutineAsActedOn();
                 completionSource.SetResult(new(in childCoroutine));
             }
 
-            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver)
-            {
-                if (_core._completionSource is null) {
-                    throw new InvalidOperationException();
-                }
-                argumentReceiver.ReceiveCallableArgument(in SpawnKey, this, _core._completionSource);
-            }
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver) => ActOnCoroutine(ref argumentReceiver, in SpawnKey, this, _core._completionSource);
 
             public override bool Equals([AllowNull] object obj) => obj is SpawnArgument<TClosure> argument && _core.Equals(in argument._core);
 
@@ -173,19 +161,15 @@ partial class Yielders
                 }
                 var childCoroutineAwaiter = childCoroutine.ConfigureAwait(false).GetAwaiter();
 
-                var intermediateCompletionSource = ManualResetCoroutineCompletionSource<TResult>.RentFromCache();
-                childCoroutine._task = intermediateCompletionSource.CreateGenericValueTask();
+                var completionSourceProxy = ManualResetCoroutineCompletionSource<TResult>.RentFromCache();
+                childCoroutine._task = completionSourceProxy.CreateGenericValueTask();
                 CoroutineMethodBuilderCore.ActOnCoroutine(ref childCoroutineAwaiter, in contextToBequest);
-                childCoroutineAwaiter.DelegateCoroutineCompletion(intermediateCompletionSource);
+                childCoroutineAwaiter.DelegateCoroutineCompletion(completionSourceProxy);
                 childCoroutine.MarkCoroutineAsActedOn();
                 completionSource.SetResult(new(in childCoroutine));
             }
 
-            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver)
-            {
-                Debug.Assert(_core._completionSource is not null);
-                argumentReceiver.ReceiveCallableArgument(in SpawnKey, this, _core._completionSource);
-            }
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver) => ActOnCoroutine(ref argumentReceiver, in SpawnKey, this, _core._completionSource);
 
             public override bool Equals([AllowNull] object obj) => obj is SpawnArgument<TClosure, TResult> argument && _core.Equals(in argument._core);
 

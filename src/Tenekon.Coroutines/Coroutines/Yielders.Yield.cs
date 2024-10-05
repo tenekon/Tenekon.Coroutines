@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Tenekon.Coroutines.Sources;
+﻿using Tenekon.Coroutines.Sources;
 using static Tenekon.Coroutines.Yielders.Arguments;
 
 namespace Tenekon.Coroutines;
@@ -10,29 +9,28 @@ partial class Yielders
     {
         var completionSource = ManualResetCoroutineCompletionSource<VoidCoroutineResult>.RentFromCache();
         var argument = new YieldArgument(completionSource);
-        return new Coroutine(completionSource, argument);
+        return new(completionSource, argument);
     }
 
-    public class YieldArgument : ICallableArgument<ManualResetCoroutineCompletionSource<VoidCoroutineResult>>, ISiblingCoroutine
+    partial class Arguments
     {
-        private readonly ManualResetCoroutineCompletionSource<VoidCoroutineResult>? _completionSource;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal YieldArgument(ManualResetCoroutineCompletionSource<VoidCoroutineResult> completionSource) => _completionSource = completionSource;
-
-        public YieldArgument() { }
-
-        void ICallableArgument<ManualResetCoroutineCompletionSource<VoidCoroutineResult>>.Callback(in CoroutineContext context, ManualResetCoroutineCompletionSource<VoidCoroutineResult> completionSource) =>
-            new YieldAwaitable.YieldAwaiter().UnsafeOnCompleted(completionSource.SetDefaultResult);
-
-        void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver)
+        public class YieldArgument : ICallableArgument<ManualResetCoroutineCompletionSource<VoidCoroutineResult>>, ISiblingCoroutine
         {
-            Debug.Assert(_completionSource is not null);
-            argumentReceiver.ReceiveCallableArgument(in YieldReturnVariantKey, this, _completionSource);
+            private readonly ManualResetCoroutineCompletionSource<VoidCoroutineResult>? _completionSource;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal YieldArgument(ManualResetCoroutineCompletionSource<VoidCoroutineResult> completionSource) => _completionSource = completionSource;
+
+            public YieldArgument() { }
+
+            void ICallableArgument<ManualResetCoroutineCompletionSource<VoidCoroutineResult>>.Callback(in CoroutineContext context, ManualResetCoroutineCompletionSource<VoidCoroutineResult> completionSource) =>
+                new YieldAwaitable.YieldAwaiter().UnsafeOnCompleted(completionSource.SetDefaultResult);
+
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver) => ActOnCoroutine(ref argumentReceiver, in YieldKey, this, _completionSource);
+
+            public override bool Equals([AllowNull] object obj) => obj is YieldArgument;
+
+            public override int GetHashCode() => 0;
         }
-
-        public override bool Equals([AllowNull] object obj) => obj is YieldArgument;
-
-        public override int GetHashCode() => 0;
     }
 }

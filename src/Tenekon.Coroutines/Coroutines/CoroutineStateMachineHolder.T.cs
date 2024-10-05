@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Threading.Tasks.Sources;
 using Tenekon.Coroutines.Iterators;
+using Tenekon.Coroutines.Sources;
 
 namespace Tenekon.Coroutines;
 
@@ -111,7 +112,53 @@ internal sealed class CoroutineStateMachineHolder<TResult, [DAM(StateMachineMemb
         }
     }
 
-    void ICoroutineResultStateMachineHolder.CallbackWhenForkNotifiedCritically<TAwaiter>(ref TAwaiter forkAwaiter, Action forkCompleted)
+    void ICoroutineResultStateMachineHolder.IncrementBackgroundTasks()
+    {
+        CoroutineStateMachineBoxResult<TResult>? currentState;
+        CoroutineStateMachineBoxResult<TResult> newState;
+
+        do {
+            currentState = _result;
+
+            if (currentState is null || currentState.State != CoroutineStateMachineBoxResult<TResult>.ResultState.NotYetComputed) {
+                throw new InvalidOperationException("Result state machine has already finished");
+            }
+
+            newState = new CoroutineStateMachineBoxResult<TResult>(currentState.ForkCount + 1);
+        } while (!ReferenceEquals(Interlocked.CompareExchange(ref _result, newState, currentState), currentState));
+    }
+
+    void ICoroutineResultStateMachineHolder.DecrementBackgroundTasks()
+    {
+        CoroutineStateMachineBoxResult<TResult>? currentState;
+        CoroutineStateMachineBoxResult<TResult>? newState;
+
+        do {
+            currentState = _result;
+
+            if (currentState is null) {
+                return;
+            }
+
+            if (currentState.ForkCount == 1 && currentState.State != CoroutineStateMachineBoxResult<TResult>.ResultState.NotYetComputed) {
+                newState = null;
+            } else {
+                newState = new CoroutineStateMachineBoxResult<TResult>(currentState, currentState.ForkCount - 1);
+            }
+        } while (!ReferenceEquals(Interlocked.CompareExchange(ref _result, newState, currentState), currentState));
+
+        if (newState is null) {
+            if (currentState.HasResult) {
+                SetResultCore(currentState.Result);
+            } else if (currentState.HasError) {
+                SetExceptionCore(currentState.Error);
+            } else {
+                throw new NotImplementedException();
+            }
+        }
+    }
+
+    void ICoroutineResultStateMachineHolder.RegisterCriticalBackgroundTaskAndNotifyOnCompletion<TAwaiter>(ref TAwaiter forkAwaiter, Action forkCompleted)
     {
         CoroutineStateMachineBoxResult<TResult>? currentState;
         CoroutineStateMachineBoxResult<TResult> newState;
@@ -208,7 +255,7 @@ internal sealed class CoroutineStateMachineHolder<TResult, [DAM(StateMachineMemb
         }
     }
 
-    void IAsyncIteratorStateMachineHolder<TResult>.SetAsyncIteratorCompletionSource(IValueTaskCompletionSource<TResult>? completionSource) =>
+    void IAsyncIteratorStateMachineHolder<TResult>.SetAsyncIteratorCompletionSource(ICompletionSource<TResult>? completionSource) =>
         _valueTaskSource._asyncIteratorCompletionSource = completionSource;
 
     void IAsyncIteratorStateMachineHolder<TResult>.SetResult(TResult result) => _valueTaskSource._valueTaskSource.SetResult(result);

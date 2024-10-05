@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Tenekon.Coroutines.Sources;
+﻿using Tenekon.Coroutines.Sources;
 using static Tenekon.Coroutines.Yielders.Arguments;
 
 namespace Tenekon.Coroutines;
@@ -11,7 +10,7 @@ partial class Yielders
     {
         var completionSource = ManualResetCoroutineCompletionSource<VoidCoroutineResult>.RentFromCache();
         var argument = new WithContextArgument<TClosure>(in additiveContext, provider, closure, providerFlags, completionSource);
-        return new Coroutine(completionSource, argument);
+        return new(completionSource, argument);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -19,7 +18,7 @@ partial class Yielders
     {
         var completionSource = ManualResetCoroutineCompletionSource<TResult>.RentFromCache();
         var argument = new WithContextArgument<TClosure, TResult>(in additiveContext, provider, closure, providerFlags, completionSource);
-        return new Coroutine<TResult>(completionSource, argument);
+        return new(completionSource, argument);
     }
 
     public static Coroutine WithContext(in CoroutineContext additiveContext, CoroutineProviderDelegate provider) => WithContextInternal<object?>(in additiveContext, provider, closure: null, CoroutineProviderFlags.None);
@@ -47,6 +46,8 @@ partial class Yielders
                 && ReferenceEquals(Provider, other.Provider)
                 && Equals(Closure, other.Closure)
                 && ProviderFlags == other.ProviderFlags;
+
+            public override bool Equals([AllowNull] object obj) => throw new NotImplementedException();
 
             public override int GetHashCode() => HashCode.Combine(AdditiveContext, Provider, Closure, ProviderFlags);
         }
@@ -99,13 +100,7 @@ partial class Yielders
                 coroutineAwaiter.DelegateCoroutineCompletion(completionSource);
             }
 
-            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver)
-            {
-                if (_core._completionSource is null) {
-                    throw new InvalidOperationException();
-                }
-                argumentReceiver.ReceiveCallableArgument(in WithContextKey, this, _core._completionSource);
-            }
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver) => ActOnCoroutine(ref argumentReceiver, in WithContextKey, this, _core._completionSource);
 
             public override bool Equals([AllowNull] object obj) => obj is WithContextArgument<TClosure> argument && _core.Equals(in argument._core);
 
@@ -161,11 +156,7 @@ partial class Yielders
                 coroutineAwaiter.DelegateCoroutineCompletion(completionSource);
             }
 
-            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver)
-            {
-                Debug.Assert(_core._completionSource is not null);
-                argumentReceiver.ReceiveCallableArgument(in WithContextKey, this, _core._completionSource);
-            }
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver) => ActOnCoroutine(ref argumentReceiver, in WithContextKey, this, _core._completionSource);
 
             public override bool Equals([AllowNull] object obj) => obj is WithContextArgument<TClosure, TResult> argument && _core.Equals(in argument._core);
 

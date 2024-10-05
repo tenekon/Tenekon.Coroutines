@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks.Sources;
+using Tenekon.Coroutines.Sources;
 
 namespace Tenekon.Coroutines.Iterators;
 
@@ -11,7 +12,7 @@ internal interface IAsyncIteratorStateMachineHolder : ICoroutineStateMachineHold
 
 internal interface IAsyncIteratorStateMachineHolder<TResult> : IAsyncIteratorStateMachineHolder, ICoroutineStateMachineHolder<TResult>, IValueTaskSource<TResult>
 {
-    void SetAsyncIteratorCompletionSource(IValueTaskCompletionSource<TResult>? completionSource);
+    void SetAsyncIteratorCompletionSource(ICompletionSource<TResult>? completionSource);
     void SetResult(TResult result);
     void SetException(Exception e);
 

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Tenekon.Coroutines.Sources;
+﻿using Tenekon.Coroutines.Sources;
 using static Tenekon.Coroutines.Yielders.Arguments;
 
 namespace Tenekon.Coroutines;
@@ -11,7 +10,7 @@ partial class Yielders
     {
         var completionSource = ManualResetCoroutineCompletionSource<VoidCoroutineResult>.RentFromCache();
         var argument = new CallArgument<TClosure>(provider, closure, providerFlags, completionSource);
-        return new Coroutine<VoidCoroutineResult>(completionSource, argument);
+        return new(completionSource, argument);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -19,7 +18,7 @@ partial class Yielders
     {
         var completionSource = ManualResetCoroutineCompletionSource<TResult>.RentFromCache();
         var argument = new CallArgument<TClosure, TResult>(provider, closure, providerFlags, completionSource);
-        return new Coroutine<TResult>(completionSource, argument);
+        return new(completionSource, argument);
     }
 
     public static Coroutine<VoidCoroutineResult> Call(Func<Coroutine> provider) => CallInternal<object?>(provider, closure: null, CoroutineProviderFlags.None);
@@ -41,19 +40,14 @@ partial class Yielders
             public readonly TClosure Closure = closure;
             public readonly CoroutineProviderFlags ProviderFlags = providerFlags;
 
-            public override int GetHashCode()
-            {
-                var code = new HashCode();
-                code.Add(Provider);
-                code.Add(Closure);
-                code.Add(ProviderFlags);
-                return code.ToHashCode();
-            }
-
             public bool Equals(in CallArgumentCore<TClosure, TResult> other) =>
                 ReferenceEquals(Provider, other.Provider)
                 && Equals(Closure, other.Closure)
                 && ProviderFlags == other.ProviderFlags;
+
+            public override bool Equals([AllowNull] object obj) => throw new NotImplementedException();
+
+            public override int GetHashCode() => HashCode.Combine(Provider, Closure, ProviderFlags);
         }
 
         public class CallArgument<TClosure> : ICallableArgument<ManualResetCoroutineCompletionSource<VoidCoroutineResult>>, ISiblingCoroutine
@@ -99,13 +93,7 @@ partial class Yielders
                 coroutineAwaiter.DelegateCoroutineCompletion(completionSource);
             }
 
-            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver)
-            {
-                if (_core._completionSource is null) {
-                    throw new InvalidOperationException();
-                }
-                argumentReceiver.ReceiveCallableArgument(in CallKey, this, _core._completionSource);
-            }
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver) => ActOnCoroutine(ref argumentReceiver, in CallKey, this, _core._completionSource);
 
             public override bool Equals([AllowNull] object obj) => obj is CallArgument<TClosure> argument && _core.Equals(in argument._core);
 
@@ -156,11 +144,7 @@ partial class Yielders
                 coroutineAwaiter.DelegateCoroutineCompletion(completionSource);
             }
 
-            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver)
-            {
-                Debug.Assert(_core._completionSource is not null);
-                argumentReceiver.ReceiveCallableArgument(in CallKey, this, _core._completionSource);
-            }
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver) => ActOnCoroutine(ref argumentReceiver, in CallKey, this, _core._completionSource);
 
             public override bool Equals([AllowNull] object obj) => obj is CallArgument<TClosure, TResult> argument && _core.Equals(in argument._core);
 

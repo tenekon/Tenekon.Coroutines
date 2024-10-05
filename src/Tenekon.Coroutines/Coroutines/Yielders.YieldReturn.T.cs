@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Tenekon.Coroutines.Sources;
+﻿using Tenekon.Coroutines.Sources;
 using static Tenekon.Coroutines.Yielders.Arguments;
 
 namespace Tenekon.Coroutines;
@@ -12,7 +11,7 @@ partial class Yielders
         {
             var completionSource = ManualResetCoroutineCompletionSource<TReturn>.RentFromCache();
             var argument = new YieldReturnArgument<TYield, TReturn>(value, completionSource);
-            return new Coroutine<TReturn>(completionSource, argument);
+            return new(completionSource, argument);
         }
     }
 
@@ -28,6 +27,8 @@ partial class Yielders
             public readonly TYield Value = value;
 
             public bool Equals(YieldReturnArgumentCore<TYield, TReturn> other) => Equals(Value, other.Value);
+
+            public override bool Equals([AllowNull] object obj) => throw new NotImplementedException();
 
             public readonly override int GetHashCode() => HashCode.Combine(Value);
         }
@@ -49,11 +50,7 @@ partial class Yielders
             void ICallableArgument<ManualResetCoroutineCompletionSource<TReturn>>.Callback(in CoroutineContext context, ManualResetCoroutineCompletionSource<TReturn> completionSource) =>
                 completionSource.SetDefaultResult();
 
-            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver)
-            {
-                Debug.Assert(_core._completionSource is not null);
-                argumentReceiver.ReceiveCallableArgument(in YieldReturnVariantKey, this, _core._completionSource);
-            }
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver) => ActOnCoroutine(ref argumentReceiver, YieldReturnVariantKey, this, _core._completionSource);
 
             public override bool Equals([AllowNull] object obj) => obj is YieldReturnArgument<TYield, TReturn> other && _core.Equals(other._core);
 

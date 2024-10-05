@@ -1,26 +1,14 @@
 ﻿using System.ComponentModel;
-using Tenekon.Coroutines.Sources;
 
 namespace Tenekon.Coroutines;
 
 delegate void BequestContextDelegate(ref CoroutineContext context, in CoroutineContext contextToBequest);
 
-file class CoroutineArgumentReceiverAcceptor(ManualResetCoroutineCompletionSource<CoroutineContext> completionSource) : AbstractCoroutineArgumentReceiverAcceptor
-{
-    protected override void AcceptCoroutineArgumentReceiver(ref CoroutineArgumentReceiver argumentReceiver) => completionSource.SetResult(argumentReceiver.Context);
-}
-
-public struct CoroutineContext : IEquatable<CoroutineContext>
+public partial struct CoroutineContext : IEquatable<CoroutineContext>
 {
     internal static CoroutineContext s_statelessCoroutineContext = default;
 
     private static readonly CoroutineContextServiceMap s_emptyKeyedServices = [];
-
-    public static Coroutine<CoroutineContext> Capture()
-    {
-        var completionSource = ManualResetCoroutineCompletionSource<CoroutineContext>.RentFromCache();
-        return new(completionSource, new CoroutineArgumentReceiverAcceptor(completionSource));
-    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void InheritOrBequestCoroutineContext(ref CoroutineContext context, in CoroutineContext contextToBequest)

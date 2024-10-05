@@ -9,7 +9,7 @@ internal struct ValueTaskAccessor : IValueTaskAccessor
     internal short _token;
     internal readonly bool _continueOnCapturedContext;
 
-    object? IValueTaskAccessor._obj { 
+    object? IValueTaskAccessor._obj {
         readonly get => _obj;
         set => _obj = value;
     }

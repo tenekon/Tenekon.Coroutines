@@ -10,6 +10,8 @@
     <EnableObjectDumper>false</EnableObjectDumper>
     <IsAotCompatible>true</IsAotCompatible>
     <RootNamespace>Tenekon</RootNamespace>
+    <!-- CA1068:CancellationToken parameters must come last -->
+    <NoWarn>CA1068</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

@@ -34,5 +34,18 @@ public sealed partial class Yielders
         public readonly static Key YieldKey = new(s_scope, 7);
         public readonly static Key ExchangeKey = new(s_scope, 8);
         public readonly static Key YieldReturnVariantKey = new(s_scope, 9);
+        public readonly static Key StartNewKey = new(s_scope, 10);
+        public readonly static Key RunKey = new(s_scope, 11);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void ActOnCoroutine<TArgument, TCompletionSource>(ref CoroutineArgumentReceiver argumentReceiver, in Key argumentKey, TArgument argument, TCompletionSource? completionSource)
+            where TArgument : ICallableArgument<TCompletionSource>
+            where TCompletionSource : class, ICoroutineCompletionSource
+        {
+            if (completionSource is null) {
+                throw new InvalidOperationException();
+            }
+            argumentReceiver.ReceiveCallableArgument(in argumentKey, argument, completionSource);
+        }
     }
 }

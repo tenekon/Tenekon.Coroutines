@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Tenekon.Coroutines.Iterators;
+﻿using Tenekon.Coroutines.Iterators;
 
 namespace Tenekon.Coroutines.CompilerServices;
 

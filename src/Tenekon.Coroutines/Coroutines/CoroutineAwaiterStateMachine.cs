@@ -26,7 +26,7 @@ internal readonly struct CoroutineAwaiterMethodBuilder<TCoroutineAwaiter>(
     public readonly bool IsCompleted => _awaiter.IsCompleted;
 
     public readonly TCoroutineAwaiter _awaiter = awaiter;
-    public readonly CoroutineStateMachineHolder<VoidCoroutineResult,CoroutineAwaiterStateMachine<CoroutineAwaiterMethodBuilder<TCoroutineAwaiter>>> _stateMachineHolder = stateMachineHolder;
+    public readonly CoroutineStateMachineHolder<VoidCoroutineResult, CoroutineAwaiterStateMachine<CoroutineAwaiterMethodBuilder<TCoroutineAwaiter>>> _stateMachineHolder = stateMachineHolder;
 
     public readonly void AwaitUnsafeOnCompleted() => _awaiter.UnsafeOnCompleted(_stateMachineHolder.MoveNextAction);
 
@@ -45,7 +45,7 @@ internal readonly struct CoroutineAwaiterMethodBuilder<TCoroutineAwaiter, TResul
     public readonly bool IsCompleted => _awaiter.IsCompleted;
 
     private readonly TCoroutineAwaiter _awaiter = awaiter;
-    private readonly CoroutineStateMachineHolder<TResult,CoroutineAwaiterStateMachine<CoroutineAwaiterMethodBuilder<TCoroutineAwaiter, TResult>, TResult>> _stateMachineHolder = stateMachineHolder;
+    private readonly CoroutineStateMachineHolder<TResult, CoroutineAwaiterStateMachine<CoroutineAwaiterMethodBuilder<TCoroutineAwaiter, TResult>, TResult>> _stateMachineHolder = stateMachineHolder;
 
     public readonly void AwaitUnsafeOnCompleted() => _awaiter.UnsafeOnCompleted(_stateMachineHolder.MoveNextAction);
 

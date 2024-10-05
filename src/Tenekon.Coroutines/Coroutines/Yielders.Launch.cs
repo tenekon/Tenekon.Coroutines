@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Tenekon.Coroutines.CompilerServices;
+﻿using Tenekon.Coroutines.CompilerServices;
 using Tenekon.Coroutines.Sources;
 using static Tenekon.Coroutines.Yielders.Arguments;
 
@@ -12,7 +11,7 @@ partial class Yielders
     {
         var completionSource = ManualResetCoroutineCompletionSource<CoroutineAwaitable>.RentFromCache();
         var argument = new LaunchArgument<TClosure>(provider, closure, providerFlags, completionSource);
-        return new Coroutine<CoroutineAwaitable>(completionSource, argument);
+        return new(completionSource, argument);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -20,7 +19,7 @@ partial class Yielders
     {
         var completionSource = ManualResetCoroutineCompletionSource<CoroutineAwaitable<TResult>>.RentFromCache();
         var argument = new LaunchArgument<TClosure, TResult>(provider, closure, providerFlags, completionSource);
-        return new Coroutine<CoroutineAwaitable<TResult>>(completionSource, argument);
+        return new(completionSource, argument);
     }
 
     public static Coroutine<CoroutineAwaitable> Launch(Func<Coroutine> provider) => LaunchInternal<object?>(provider, closure: null, CoroutineProviderFlags.None);
@@ -42,19 +41,14 @@ partial class Yielders
             public readonly TClosure Closure = closure;
             public readonly CoroutineProviderFlags ProviderFlags = providerFlags;
 
-            public override int GetHashCode()
-            {
-                var code = new HashCode();
-                code.Add(Provider);
-                code.Add(Closure);
-                code.Add(ProviderFlags);
-                return code.ToHashCode();
-            }
-
             public bool Equals(in LaunchArgumentCore<TClosure, TResult> other) =>
                 ReferenceEquals(Provider, other.Provider)
                 && Equals(Closure, other.Closure)
                 && ProviderFlags == other.ProviderFlags;
+
+            public override bool Equals([AllowNull] object obj) => throw new NotImplementedException();
+
+            public override int GetHashCode() => HashCode.Combine(Provider, Closure, ProviderFlags);
         }
 
         public class LaunchArgument<TClosure> : ICallableArgument<ManualResetCoroutineCompletionSource<CoroutineAwaitable>>, ISiblingCoroutine
@@ -91,20 +85,20 @@ partial class Yielders
                     coroutine = Unsafe.As<Func<Coroutine>>(Provider)();
                 }
                 var coroutineAwaiter = coroutine.ConfigureAwait(false).GetAwaiter();
-                var intermediateCompletionSource = ManualResetCoroutineCompletionSource<object?>.RentFromCache();
-                coroutine._task = intermediateCompletionSource.CreateValueTask();
+                var completionSourceProxy = ManualResetCoroutineCompletionSource<object?>.RentFromCache();
+                coroutine._task = completionSourceProxy.CreateValueTask();
 
                 var contextToBequest = default(CoroutineContext);
                 contextToBequest.TreatAsNewSibling();
                 CoroutineContext.InheritOrBequestCoroutineContext(ref contextToBequest, in context);
 
                 CoroutineMethodBuilderCore.ActOnCoroutine(ref coroutineAwaiter, in contextToBequest);
-                context.ResultStateMachine.CallbackWhenForkNotifiedCritically(ref coroutineAwaiter, () => {
+                context.ResultStateMachine.RegisterCriticalBackgroundTaskAndNotifyOnCompletion(ref coroutineAwaiter, () => {
                     try {
                         coroutineAwaiter.GetResult();
-                        intermediateCompletionSource.SetResult(default);
+                        completionSourceProxy.SetResult(default);
                     } catch (Exception error) {
-                        intermediateCompletionSource.SetException(error);
+                        completionSourceProxy.SetException(error);
                         throw; // Must bubble up
                     }
                 });
@@ -112,13 +106,7 @@ partial class Yielders
                 completionSource.SetResult(new(in coroutine));
             }
 
-            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver)
-            {
-                if (_core._completionSource is null) {
-                    throw new InvalidOperationException();
-                }
-                argumentReceiver.ReceiveCallableArgument(in LaunchKey, this, _core._completionSource);
-            }
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver) => ActOnCoroutine(ref argumentReceiver, in LaunchKey, this, _core._completionSource);
 
             public override bool Equals([AllowNull] object obj) => obj is LaunchArgument<TClosure> argument && _core.Equals(in argument._core);
 
@@ -160,20 +148,20 @@ partial class Yielders
                     coroutine = Unsafe.As<Func<Coroutine<TResult>>>(Provider)();
                 }
                 var coroutineAwaiter = coroutine.ConfigureAwait(false).GetAwaiter();
-                var intermediateCompletionSource = ManualResetCoroutineCompletionSource<TResult>.RentFromCache();
-                coroutine._task = intermediateCompletionSource.CreateGenericValueTask();
+                var completionSourceProxy = ManualResetCoroutineCompletionSource<TResult>.RentFromCache();
+                coroutine._task = completionSourceProxy.CreateGenericValueTask();
 
                 var contextToBequest = default(CoroutineContext);
                 contextToBequest.TreatAsNewSibling();
                 CoroutineContext.InheritOrBequestCoroutineContext(ref contextToBequest, in context);
 
                 CoroutineMethodBuilderCore.ActOnCoroutine(ref coroutineAwaiter, in contextToBequest);
-                context.ResultStateMachine.CallbackWhenForkNotifiedCritically(ref coroutineAwaiter, () => {
+                context.ResultStateMachine.RegisterCriticalBackgroundTaskAndNotifyOnCompletion(ref coroutineAwaiter, () => {
                     try {
                         var result = coroutineAwaiter.GetResult();
-                        intermediateCompletionSource.SetResult(result);
+                        completionSourceProxy.SetResult(result);
                     } catch (Exception error) {
-                        intermediateCompletionSource.SetException(error);
+                        completionSourceProxy.SetException(error);
                         throw; // Must bubble up
                     }
                 });
@@ -181,11 +169,7 @@ partial class Yielders
                 completionSource.SetResult(new(in coroutine));
             }
 
-            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver)
-            {
-                Debug.Assert(_core._completionSource is not null);
-                argumentReceiver.ReceiveCallableArgument(in LaunchKey, this, _core._completionSource);
-            }
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver) => ActOnCoroutine(ref argumentReceiver, in LaunchKey, this, _core._completionSource);
 
             public override bool Equals([AllowNull] object obj) => obj is LaunchArgument<TClosure, TResult> argument && _core.Equals(in argument._core);
 

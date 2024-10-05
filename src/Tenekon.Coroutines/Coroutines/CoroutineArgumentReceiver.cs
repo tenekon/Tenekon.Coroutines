@@ -1,5 +1,5 @@
-﻿using Tenekon.Coroutines.Iterators;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using Tenekon.Coroutines.Iterators;
 
 namespace Tenekon.Coroutines;
 

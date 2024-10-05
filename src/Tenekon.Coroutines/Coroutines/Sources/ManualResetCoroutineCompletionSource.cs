@@ -5,7 +5,7 @@ namespace Tenekon.Coroutines.Sources;
 
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-internal class ManualResetCoroutineCompletionSource<TResult> : IValueTaskSource<TResult>, IValueTaskSource, IValueTaskCompletionSource<TResult>, ICoroutineCompletionSource
+internal class ManualResetCoroutineCompletionSource<TResult> : IValueTaskSource<TResult>, IValueTaskSource, ICompletionSource<TResult>, ICoroutineCompletionSource
 {
     /// <summary>Per-core cache of boxes, with one box per core.</summary>
     /// <remarks>Each element is padded to expected cache-line size so as to minimize false sharing.</remarks>

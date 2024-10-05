@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Tenekon.Coroutines.Sources;
+﻿using Tenekon.Coroutines.Sources;
 using static Tenekon.Coroutines.Yielders.Arguments;
 
 namespace Tenekon.Coroutines;
@@ -10,7 +9,7 @@ partial class Yielders
     {
         var completionSource = ManualResetCoroutineCompletionSource<VoidCoroutineResult>.RentFromCache();
         var argument = new ThrowArgument(exception, completionSource);
-        return new Coroutine(completionSource, argument);
+        return new(completionSource, argument);
     }
 
     partial class Arguments
@@ -23,6 +22,8 @@ partial class Yielders
             public readonly Exception Exception = exception;
 
             public bool Equals(in ThrowArgumentCore other) => Equals(Exception, other.Exception);
+
+            public override bool Equals([AllowNull] object obj) => throw new NotImplementedException();
 
             public readonly override int GetHashCode() => Exception.GetHashCode();
         }
@@ -46,11 +47,7 @@ partial class Yielders
             void ICallableArgument<ManualResetCoroutineCompletionSource<VoidCoroutineResult>>.Callback(in CoroutineContext context, ManualResetCoroutineCompletionSource<VoidCoroutineResult> completionSource) =>
                 completionSource.SetException(_core.Exception);
 
-            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver)
-            {
-                Debug.Assert(_core._completionSource is not null);
-                argumentReceiver.ReceiveCallableArgument(in ThrowKey, this, _core._completionSource);
-            }
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver) => ActOnCoroutine(ref argumentReceiver, in ThrowKey, this, _core._completionSource);
 
             public override bool Equals([AllowNull] object obj) => obj is ThrowArgument other && _core.Equals(in other._core);
 

@@ -2,7 +2,7 @@
 
 public interface ICallableArgument
 {
-    internal void Callback(in CoroutineArgumentReceiver argumentReceiver, in Key argumentKey, object completionSource) => throw new NotImplementedException();
+    internal void Callback(in CoroutineArgumentReceiver argumentReceiver, in Key argumentKey, object completionSource) => throw new NotImplementedException("Implemented by derived type");
 }
 
 public interface ICallableArgument<in TCompletionSource> : ICallableArgument where TCompletionSource : class, ICoroutineCompletionSource

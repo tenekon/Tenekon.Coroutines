@@ -18,7 +18,7 @@ public partial struct CoroutineMethodBuilder<TResult>
 
     private CoroutineStateMachineHolder<TResult> _stateMachineHolder;
 
-    public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine => 
+    public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine =>
         _ = GetStateMachineHolder(ref stateMachine, ref _stateMachineHolder);
 
     public readonly void SetException(Exception e) => _stateMachineHolder.SetException(e);

@@ -6,7 +6,7 @@ internal struct ManualResetValueTaskSourceProxy<TResult>
 {
     internal ManualResetValueTaskSourceCore<TResult> _valueTaskSource;
 
-    internal IValueTaskCompletionSource<TResult>? _asyncIteratorCompletionSource;
+    internal ICompletionSource<TResult>? _asyncIteratorCompletionSource;
 
     public bool RunContinuationsAsynchronously {
         readonly get => _valueTaskSource.RunContinuationsAsynchronously;
