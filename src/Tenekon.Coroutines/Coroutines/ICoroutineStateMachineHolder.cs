@@ -7,16 +7,18 @@
 /// </summary>
 internal interface ICoroutineStateMachineHolder
 {
-    ref CoroutineContext CoroutineContext { get; }
+    bool IsWaitingForChildrenToComplete { get; }
 
-    /// <summary>Move the state machine forward.</summary>
-    void MoveNext();
+    ref CoroutineContext CoroutineContext { get; }
 
     /// <summary>
     /// Gets an action for moving forward the contained state machine.
     /// This will lazily-allocate the delegate as needed.
     /// </summary>
     Action MoveNextAction { get; }
+
+    /// <summary>Move the state machine forward.</summary>
+    void MoveNext();
 }
 
 internal interface ICoroutineStateMachineHolder<TResult> : ICoroutineStateMachineHolder

@@ -35,7 +35,7 @@ partial class AsyncIteratorTests
             protected override ValueTask<int> Unwrap(int resultWrapper) => new(resultWrapper);
         }
 
-        public class AsyncCoroutineWithAsyncResult() : AbstractAsyncCoroutineWithCoroutineWrappedResult<int, int>(One, Two)
+        public class AsyncCoroutineWithCoroutineWrappedResult() : AbstractAsyncCoroutineWithCoroutineWrappedResult<int, int>(One, Two)
         {
             protected override async Coroutine<int> CreateCoroutine() => await Call(async () => {
                 await Task.Delay(ContinueAfterTimeInMs);

@@ -25,7 +25,7 @@ partial class AsyncIteratorTests
             protected override async ValueTask<Coroutine<int>> Unwrap(Coroutine<CoroutineAwaitable<int>> coroutine) => await coroutine;
         }
 
-        public class SyncCoroutineWithAsyncResult() : AbstractSyncCoroutineWithCoroutineWrappedResult<CoroutineAwaitable<int>, int>(One)
+        public class SyncCoroutineWithCoroutineWrappedResult() : AbstractSyncCoroutineWithCoroutineWrappedResult<CoroutineAwaitable<int>, int>(One)
         {
             protected override Coroutine<CoroutineAwaitable<int>> CreateCoroutine() => Spawn(async () => {
                 await Task.Delay(ContinueAfterTimeInMs);
@@ -36,9 +36,9 @@ partial class AsyncIteratorTests
             protected override async ValueTask<Coroutine<int>> Unwrap(Coroutine<CoroutineAwaitable<int>> x) => await x;
         }
 
-        public class AsyncCoroutineWithAsyncResult() : AbstractAsyncCoroutineWithCoroutineWrappedResult<CoroutineAwaitable<int>, int>(One, Two)
+        public class AsyncCoroutineWithCoroutineWrappedResult() : AbstractAsyncCoroutineWithCoroutineWrappedResult<CoroutineAwaitable<int>, int>(One, new(new(Two)))
         {
-            protected override Coroutine<CoroutineAwaitable<int>> CreateCoroutine() => Spawn(async () => {
+            protected override async Coroutine<CoroutineAwaitable<int>> CreateCoroutine() => await Spawn(async () => {
                 await Task.Delay(ContinueAfterTimeInMs);
                 return ExpectedResult;
             });

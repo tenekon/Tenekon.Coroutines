@@ -31,6 +31,13 @@ internal struct SuspensionPoint
         _argumentCompletionSource = argumentCompletionSource;
     }
 
+    internal void SupplyAwaiterCompletionNotifierInternal(ManualResetCoroutineCompletionSource<VoidCoroutineResult> awaiterCompletionNotifierSource)
+    {
+        ThrowIfNotRequiringAwaiterCompletionNotifier(in this);
+        _state = SuspensionPointState.AwaiterCompletionNotifierSupplied | (_state & ~SuspensionPointState.AwaiterCompletionNotifierRequired);
+        _awaiterCompletionNotifier = awaiterCompletionNotifierSource.CreateValueTask();
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void BeginSupplyingAwaiterCompletionNotifier(out ManualResetCoroutineCompletionSource<VoidCoroutineResult> externTaskCompletionNotifierSource)
     {

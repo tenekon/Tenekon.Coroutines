@@ -13,6 +13,8 @@ internal abstract class CoroutineStateMachineHolder<TResult> : IValueTaskSource<
     /// <summary>Gets the current version number of the box.</summary>
     public short Version => _valueTaskSource.Version;
 
+    public bool IsWaitingForChildrenToComplete => _result is CoroutineStateMachineBoxResult<TResult> result && (result.Status & CoroutineStateMachineBoxResult<TResult>.CoroutineStatus.Completed) != 0;
+
     /// <summary>A delegate to the MoveNext method.</summary>
     protected Action? _moveNextAction;
 
@@ -46,49 +48,17 @@ internal abstract class CoroutineStateMachineHolder<TResult> : IValueTaskSource<
     public void OnCompleted(Action<object?> continuation, object? state, short token, ValueTaskSourceOnCompletedFlags flags) =>
         _valueTaskSource.OnCompleted(continuation, state, token, flags);
 
-    protected void SetExceptionCore(Exception error)
-    {
-        _valueTaskSource.SetException(error);
-    }
+    protected void SetExceptionDirectly(Exception error) => _valueTaskSource.SetException(error);
 
-    protected void SetResultCore(TResult result)
-    {
-        _valueTaskSource.SetResult(result);
-    }
+    protected void SetResultDirectly(TResult result) => _valueTaskSource.SetResult(result);
 
     /// <summary>Completes the box with a result.</summary>
     /// <param name="result">The result.</param>
-    public void SetResult(TResult result)
-    {
-        CoroutineStateMachineBoxResult<TResult> currentState;
-        CoroutineStateMachineBoxResult<TResult>? newState;
-
-        do {
-            currentState = _result!; // Cannot be null at this state
-            newState = currentState.ForkCount == 0 ? null : new CoroutineStateMachineBoxResult<TResult>(currentState.ForkCount, result);
-        } while (!ReferenceEquals(Interlocked.CompareExchange(ref _result, newState, currentState), currentState));
-
-        if (newState is null) {
-            SetResultCore(result);
-        }
-    }
+    public abstract void SetResult(TResult result);
 
     /// <summary>Completes the box with an error.</summary>
     /// <param name="error">The exception.</param>
-    public void SetException(Exception error)
-    {
-        CoroutineStateMachineBoxResult<TResult> currentState;
-        CoroutineStateMachineBoxResult<TResult>? newState;
-
-        do {
-            currentState = _result!; // Cannot be null at this state
-            newState = currentState.ForkCount == 0 ? null : new CoroutineStateMachineBoxResult<TResult>(currentState.ForkCount, error);
-        } while (!ReferenceEquals(Interlocked.CompareExchange(ref _result, newState, currentState), currentState));
-
-        if (newState is null) {
-            SetExceptionCore(error);
-        }
-    }
+    public abstract void SetException(Exception error);
 
     /// <summary>Implemented by derived type.</summary>
     TResult IValueTaskSource<TResult>.GetResult(short token) => throw Exceptions.ImplementedByDerivedType();
@@ -107,9 +77,13 @@ internal abstract class CoroutineStateMachineHolder<TResult> : IValueTaskSource<
     /// <summary>Type used as a singleton to indicate synchronous success for an async method.</summary>
     internal sealed class SynchronousSuccessSentinelCoroutineStateMachineBox : CoroutineStateMachineHolder<TResult>, ICoroutineResultStateMachineHolder
     {
-        public SynchronousSuccessSentinelCoroutineStateMachineBox() => SetResultCore(default!);
+        public SynchronousSuccessSentinelCoroutineStateMachineBox() => SetResultDirectly(default!);
 
         void ICoroutineResultStateMachineHolder.RegisterCriticalBackgroundTaskAndNotifyOnCompletion<TAwaiter>(ref TAwaiter awaiter, Action continuation) =>
             awaiter.UnsafeOnCompleted(continuation);
+
+        public override void SetResult(TResult result) => SetResultDirectly(result);
+
+        public override void SetException(Exception error) => SetExceptionDirectly(error);
     }
 }

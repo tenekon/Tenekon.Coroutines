@@ -1,8 +1,29 @@
-﻿namespace Tenekon.Coroutines;
+﻿using Tenekon.Coroutines.Sources;
+
+namespace Tenekon.Coroutines;
 
 internal class CoroutineStateMachineBoxResult<TResult> : IEquatable<CoroutineStateMachineBoxResult<TResult>>
 {
     public static readonly CoroutineStateMachineBoxResult<TResult> Default = new();
+
+    public int ForkCount { get; init; }
+
+    [MemberNotNullWhen(true, nameof(Result))]
+    public bool IsCompletedSuccessfully {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => (Status & CoroutineStatus.CompletedSuccessfully) != 0;
+    }
+
+    [MemberNotNullWhen(true, nameof(Exception))]
+    public bool IsFaulted {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => (Status & CoroutineStatus.Faulted) != 0;
+    }
+
+    public CoroutineStatus Status { get; init; }
+    public TResult Result { get; init; }
+    public ManualResetCoroutineCompletionSource<VoidCoroutineResult>? CompletionSource { get; }
+    public Exception? Exception { get; init; }
 
     private CoroutineStateMachineBoxResult()
     {
@@ -15,50 +36,31 @@ internal class CoroutineStateMachineBoxResult<TResult> : IEquatable<CoroutineSta
         ForkCount = forkCount;
     }
 
-    public CoroutineStateMachineBoxResult(int forkCount, TResult result)
+    public CoroutineStateMachineBoxResult(int forkCount, TResult result, ManualResetCoroutineCompletionSource<VoidCoroutineResult>? completionSource)
     {
         ForkCount = forkCount;
-        State = ResultState.HasResult;
+        Status = CoroutineStatus.CompletedSuccessfully;
         Result = result;
+        CompletionSource = completionSource;
     }
 
-    public CoroutineStateMachineBoxResult(int forkCount, Exception error)
+    public CoroutineStateMachineBoxResult(int forkCount, Exception exception, ManualResetCoroutineCompletionSource<VoidCoroutineResult>? completionSource)
     {
         ForkCount = forkCount;
-        State = ResultState.HasError;
+        Status = CoroutineStatus.Faulted;
         Result = default!;
-        Error = error;
+        Exception = exception;
+        CompletionSource = completionSource;
     }
 
     public CoroutineStateMachineBoxResult(CoroutineStateMachineBoxResult<TResult> original, int forkCount)
     {
         ForkCount = forkCount;
-        State = original.State;
+        Status = original.Status;
         Result = original.Result;
-        Error = original.Error;
+        Exception = original.Exception;
+        CompletionSource = original.CompletionSource;
     }
-
-    public int ForkCount { get; init; }
-
-    [MemberNotNullWhen(true, nameof(Result))]
-    public bool HasResult {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get {
-            return State.HasFlag(ResultState.HasResult);
-        }
-    }
-
-    [MemberNotNullWhen(true, nameof(Error))]
-    public bool HasError {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get {
-            return State.HasFlag(ResultState.HasError);
-        }
-    }
-
-    public ResultState State { get; init; }
-    public TResult Result { get; init; }
-    public Exception? Error { get; init; }
 
     public bool Equals(CoroutineStateMachineBoxResult<TResult>? other)
     {
@@ -66,14 +68,15 @@ internal class CoroutineStateMachineBoxResult<TResult> : IEquatable<CoroutineSta
             return false;
         }
 
-        return ForkCount == other.ForkCount &&
-            State == other.State;
+        return ForkCount == other.ForkCount && Status == other.Status && !(CompletionSource is null ^ other.CompletionSource is null);
     }
 
-    internal enum ResultState : byte
+    [Flags]
+    internal enum CoroutineStatus : byte
     {
-        NotYetComputed = 0,
-        HasResult = 1,
-        HasError = 2
+        Running = 0,
+        CompletedSuccessfully = 1,
+        Faulted = 2,
+        Completed = CompletedSuccessfully | Faulted
     }
 }

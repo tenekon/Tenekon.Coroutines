@@ -12,7 +12,7 @@ partial class AsyncIteratorTests
             protected override async ValueTask<Coroutine<int>> Unwrap(Coroutine<CoroutineAwaitable<int>> coroutine) => await coroutine;
         }
 
-        public class SyncCoroutineWithAsyncResult() : AbstractSyncCoroutineWithCoroutineWrappedResult<CoroutineAwaitable<int>, int>(One)
+        public class SyncCoroutineWithCoroutineWrappedResult() : AbstractSyncCoroutineWithCoroutineWrappedResult<CoroutineAwaitable<int>, int>(One)
         {
             protected override Coroutine<CoroutineAwaitable<int>> CreateCoroutine() => Coroutine.Run(async () => {
                 await Task.Delay(ContinueAfterTimeInMs);
@@ -21,23 +21,17 @@ partial class AsyncIteratorTests
 
             protected override ValueTask<int> Unwrap(CoroutineAwaitable<int> resultWrapper) => resultWrapper;
             protected override async ValueTask<Coroutine<int>> Unwrap(Coroutine<CoroutineAwaitable<int>> x) => await x;
-
-            [Fact]
-            public override Task GetResult_Returns() => base.GetResult_Returns();
         }
 
-        public class AsyncCoroutineWithAsyncResult() : AbstractAsyncCoroutineWithCoroutineWrappedResult<CoroutineAwaitable<int>, int>(One, Two)
+        public class AsyncCoroutineWithCoroutineWrappedResult() : AbstractAsyncCoroutineWithCoroutineWrappedResult<CoroutineAwaitable<int>, int>(One, new(new(Two)))
         {
-            protected override Coroutine<CoroutineAwaitable<int>> CreateCoroutine() => Coroutine.Run(async () => {
+            protected async override Coroutine<CoroutineAwaitable<int>> CreateCoroutine() => await Coroutine.Run(async () => {
                 await Task.Delay(ContinueAfterTimeInMs);
                 return ExpectedResult;
             });
 
             protected override ValueTask<int> Unwrap(CoroutineAwaitable<int> resultWrapper) => resultWrapper;
             protected override async ValueTask<Coroutine<int>> Unwrap(Coroutine<CoroutineAwaitable<int>> x) => await x;
-
-            [Fact]
-            public override Task GetResult_Returns() => base.GetResult_Returns();
         }
     }
 }

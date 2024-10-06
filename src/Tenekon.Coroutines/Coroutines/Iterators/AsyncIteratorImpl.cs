@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Threading.Tasks.Sources;
 using Tenekon.Coroutines.CompilerServices;
 using Tenekon.Coroutines.Sources;
 
@@ -147,15 +148,24 @@ internal partial class AsyncIteratorImpl<TResult> : IAsyncIterator<TResult>, IAs
         if (_nextSuspensionPoint._state != 0) {
             try {
                 if ((_nextSuspensionPoint._state & SuspensionPointState.ArgumentSupplied) != 0) {
-                    var argumentReceiver = new CoroutineArgumentReceiver(in iteratorContext._iteratorAgnosticCoroutineContext);
                     Debug.Assert(_nextSuspensionPoint._argument is not null);
                     Debug.Assert(_nextSuspensionPoint._argumentCompletionSource is not null);
+                    Debug.Assert(iteratorContext._coroutineStateMachineHolder is not null);
+
+                    var argumentReceiver = new CoroutineArgumentReceiver(in iteratorContext._iteratorAgnosticCoroutineContext);
                     _nextSuspensionPoint._argument.Callback(in argumentReceiver, in _nextSuspensionPoint._argumentKey, _nextSuspensionPoint._argumentCompletionSource);
                     iteratorContextService._currentSuspensionPoint.RequireAwaiterCompletionNotifier();
                     await _nextSuspensionPoint._awaiterCompletionNotifier;
-                    iteratorContext._coroutineStateMachineHolder?.MoveNext();
+                    iteratorContext._coroutineStateMachineHolder.MoveNext();
 
                     if (iteratorContext._coroutineAwaiter.IsCompleted) {
+                        return false;
+                    }
+
+                    if (iteratorContext._coroutineStateMachineHolder.IsWaitingForChildrenToComplete) {
+                        var nextSuspensionPoint = iteratorContextService._currentSuspensionPoint;
+                        iteratorContextService._currentSuspensionPoint.RequireAwaiterCompletionNotifier();
+                        await nextSuspensionPoint._awaiterCompletionNotifier;
                         return false;
                     }
                 } else {
@@ -244,7 +254,7 @@ internal partial class AsyncIteratorImpl<TResult> : IAsyncIterator<TResult>, IAs
                     Debug.Assert(_nextSuspensionPoint._argumentCompletionSource is not null);
                     _nextSuspensionPoint._argumentCompletionSource.SetException(new CancellationException());
                     iteratorContext._coroutineStateMachineHolder?.MoveNext();
-                    if (completionSource.GetStatus(completionSource.Version) == System.Threading.Tasks.Sources.ValueTaskSourceStatus.Faulted) {
+                    if (completionSource.GetStatus(completionSource.Version) == ValueTaskSourceStatus.Faulted) {
                         iteratorContext._coroutineStateMachineHolder!.SetResult(result);
                     }
                     iteratorContext._coroutineStateMachineHolder!.SetAsyncIteratorCompletionSource(null);
