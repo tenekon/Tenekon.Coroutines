@@ -1,3 +1,12 @@
+# [0.1.0-preview.4](https://github.com/tenekon/Tenekon.Coroutines/compare/0.1.0-preview.3...0.1.0-preview.4) (2024-10-06)
+
+
+### Bug Fixes
+
+* removed compile-only dependencies from package manifest ([5cd9c8d](https://github.com/tenekon/Tenekon.Coroutines/commit/5cd9c8da2d1e25b8c6581ac8815ae6be54b07b00))
+
+
+
 # [0.1.0-preview.3](https://github.com/tenekon/Tenekon.Coroutines/compare/0.1.0-preview.2...0.1.0-preview.3) (2024-10-06)
 
 
