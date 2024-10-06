@@ -33,7 +33,7 @@ public sealed partial class Yielders
         public readonly static Key ThrowKey = new(s_scope, 6);
         public readonly static Key YieldKey = new(s_scope, 7);
         public readonly static Key ExchangeKey = new(s_scope, 8);
-        public readonly static Key YieldReturnVariantKey = new(s_scope, 9);
+        public readonly static Key YieldAssign = new(s_scope, 9);
         public readonly static Key StartNewKey = new(s_scope, 10);
         public readonly static Key RunKey = new(s_scope, 11);
 

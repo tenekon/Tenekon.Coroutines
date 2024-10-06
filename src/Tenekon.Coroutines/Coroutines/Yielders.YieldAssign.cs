@@ -5,17 +5,17 @@ namespace Tenekon.Coroutines;
 
 partial class Yielders
 {
-    public readonly struct YieldReturnQuery<TYield>(TYield value)
+    public readonly struct YieldAssign<TYield>(TYield value)
     {
-        public readonly Coroutine<TReturn> Return<TReturn>()
+        public readonly Coroutine<TAssign> Assign<TAssign>()
         {
-            var completionSource = ManualResetCoroutineCompletionSource<TReturn>.RentFromCache();
-            var argument = new YieldReturnArgument<TYield, TReturn>(value, completionSource);
+            var completionSource = ManualResetCoroutineCompletionSource<TAssign>.RentFromCache();
+            var argument = new YieldReturnArgument<TYield, TAssign>(value, completionSource);
             return new(completionSource, argument);
         }
     }
 
-    public static YieldReturnQuery<TValue> Yield<TValue>(TValue value) => new(value);
+    public static YieldAssign<TYield> Yield<TYield>(TYield value) => new(value);
 
     partial class Arguments
     {
@@ -33,9 +33,9 @@ partial class Yielders
             public readonly override int GetHashCode() => HashCode.Combine(Value);
         }
 
-        public class YieldReturnArgument<TYield, TReturn> : ICallableArgument<ManualResetCoroutineCompletionSource<TReturn>>, ISiblingCoroutine
+        public class YieldReturnArgument<TYield, TAssign> : ICallableArgument<ManualResetCoroutineCompletionSource<TAssign>>, ISiblingCoroutine
         {
-            private readonly YieldReturnArgumentCore<TYield, TReturn> _core;
+            private readonly YieldReturnArgumentCore<TYield, TAssign> _core;
 
             public TYield Value {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -43,16 +43,16 @@ partial class Yielders
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            internal YieldReturnArgument(TYield value, ManualResetCoroutineCompletionSource<TReturn> completionSource) => _core = new(value, completionSource);
+            internal YieldReturnArgument(TYield value, ManualResetCoroutineCompletionSource<TAssign> completionSource) => _core = new(value, completionSource);
 
             public YieldReturnArgument(TYield value) => _core = new(value, completionSource: null);
 
-            void ICallableArgument<ManualResetCoroutineCompletionSource<TReturn>>.Callback(in CoroutineContext context, ManualResetCoroutineCompletionSource<TReturn> completionSource) =>
+            void ICallableArgument<ManualResetCoroutineCompletionSource<TAssign>>.Callback(in CoroutineContext context, ManualResetCoroutineCompletionSource<TAssign> completionSource) =>
                 completionSource.SetDefaultResult();
 
-            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver) => ActOnCoroutine(ref argumentReceiver, YieldReturnVariantKey, this, _core._completionSource);
+            void ISiblingCoroutine.ActOnCoroutine(ref CoroutineArgumentReceiver argumentReceiver) => ActOnCoroutine(ref argumentReceiver, YieldAssign, this, _core._completionSource);
 
-            public override bool Equals([AllowNull] object obj) => obj is YieldReturnArgument<TYield, TReturn> other && _core.Equals(other._core);
+            public override bool Equals([AllowNull] object obj) => obj is YieldReturnArgument<TYield, TAssign> other && _core.Equals(other._core);
 
             public override int GetHashCode() => _core.GetHashCode();
         }

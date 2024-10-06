@@ -29,9 +29,9 @@ partial class AsyncIteratorImpl<TResult>
 
     ValueTask<bool> IAsyncIterator.MoveNextAsync() => MoveNextAsync();
 
-    void IAsyncIterator.YieldReturn<TYieldResult>(TYieldResult result) => YieldReturn(result);
+    void IAsyncIterator.YieldAssign<TYieldResult>(TYieldResult result) => YieldAssign(result);
 
-    void IAsyncIterator.YieldReturn() => YieldReturn();
+    void IAsyncIterator.YieldAssign() => YieldAssign();
 
     void IAsyncIterator.Return() => Return(default!);
 

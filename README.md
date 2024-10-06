@@ -34,7 +34,7 @@ dotnet add package Tenekon.Coroutines --version <type version here>
 
 ## Quick start guide
 
-**Simple Coroutine**
+**Simple Coroutine: Hello World**
 
 ```csharp
 using static Tenekon.Coroutines.Yielders;
@@ -53,7 +53,31 @@ await Func<Coroutine>(async () => {
 // Hello world
 ```
 
-**Simple AsyncIterator**
+**Advanced Coroutine: Parallelism**
+
+```csharp
+await Coroutine.Start(async () =>
+{
+    var t1 = await Coroutine.Factory.StartNew(async () =>
+    {
+        Thread.Sleep(3000);
+        Console.WriteLine(DateTime.UtcNow - Process.GetCurrentProcess().StartTime.ToUniversalTime() + ": Finished");
+    });
+
+    var t2 = await Coroutine.Factory.StartNew(async () =>
+    {
+        Thread.Sleep(3000);
+        Console.WriteLine(DateTime.UtcNow - Process.GetCurrentProcess().StartTime.ToUniversalTime() + ": Finished");
+    });
+
+    await Task.WhenAll(t1.AsTask(), t2.AsTask());
+});
+
+// 00:00:03.0317613: Finished
+// 00:00:03.0317757: Finished
+```
+
+**Simple AsyncIterator: Iterator**
 
 ```csharp
 using static Tenekon.Coroutines.Yielders;
@@ -64,16 +88,15 @@ var iterator = AsyncIterator.Create(async () => {
 });
 
 while (await iterator.MoveNextAsync()) {
-  if (iterator.CurrentKey == CallKey) {
-    Console.WriteLine(((CallArgument<string>)iterator.Current).Closure);
-  }
+  Console.WriteLine(((CallArgument<string>)iterator.Current).Closure);
 }
 
 // Outputs:
 // Hello world
+// Hello world
 ```
 
-**Advanced AsyncIterator**
+**Advanced AsyncIterator: Iterator, Replace Current**
 
 ```csharp
 using static Tenekon.Coroutines.Yielders;
@@ -84,10 +107,8 @@ var iterator = AsyncIterator.Create(async () => {
 });
 
 while (await iterator.MoveNextAsync()) {
-  if (iterator.CurrentKey == CallKey) {
-    Console.WriteLine(((CallArgument<string>)iterator.Current).Closure);
-    iterator.Current = new CallArgument<string>(Console.WriteLine, "Hello iterator")
-  }
+  Console.WriteLine(((CallArgument<string>)iterator.Current).Closure);
+  iterator.Current = new CallArgument<string>(Console.WriteLine, "Hello iterator")
 }
 
 // Outputs:
@@ -95,7 +116,7 @@ while (await iterator.MoveNextAsync()) {
 // Hello iterator
 ```
 
-**Advanced AsyncIterator**
+**Advanced AsyncIterator: Iterator, Yield Assign**
 
 ```csharp
 using static Tenekon.Coroutines.Iterator.Yielders;
@@ -106,10 +127,8 @@ var iterator = AsyncIterator.Create(async () => {
 });
 
 while (await iterator.MoveNextAsync()) {
-  if (iterator.CurrentKey == ExchangeKey) {
-    Console.WriteLine(((ExchangeArgument<string>)iterator.Current).Value);
-    iterator.YieldReturn("Hello iterator");
-  }
+  Console.WriteLine(((ExchangeArgument<string>)iterator.Current).Value);
+  iterator.YieldAssign("Hello iterator");
 }
 
 // Outputs:
@@ -123,11 +142,61 @@ Yielders are the equivalent to effects in Redux-Saga.
 
 In the following are all available `Yielders` classes and their contained yielders listed.
 
-We recommend to make use of `using static`, e.g. `using static Tenekon.Coroutines.Yielders`.
+### Tenekon.Coroutines.Coroutine
+
+The yielding components of `Coroutine` are designed to align with the functionality of `Task`.
+
+#### Tenekon.Coroutines.Coroutine.Yield
+
+Use `Yield` to instruct the coroutine to suspend and resume immediatelly. In the underlying code, `Task.Yield()` is used.
+
+| Yielder | Signature                     |
+| ------- | ----------------------------- |
+| `Yield` | `Coroutine Coroutine Yield()` |
+
+#### Tenekon.Coroutines.Coroutine.Run
+
+The `Coroutine.Run` yielder is the equivalent to `Task.Run`
+
+| Yielder         | Signature                                                                                                                                                           |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Coroutine.Run` | `Coroutine<CoroutineAwaitable> Run(Func<Coroutine> provider, CancellationToken cancellationToken)`                                                                  |
+| `Coroutine.Run` | `Coroutine<CoroutineAwaitable> Run(Func<Coroutine> provider)`                                                                                                       |
+| `Coroutine.Run` | `Coroutine<CoroutineAwaitable> Run<TClosure>(Func<TClosure, Coroutine> provider, TClosure closure, CancellationToken cancellationToken)`                            |
+| `Coroutine.Run` | `Coroutine<CoroutineAwaitable> Run<TClosure>(Func<TClosure, Coroutine> provider, TClosure closure)`                                                                 |
+| `Coroutine.Run` | `Coroutine<CoroutineAwaitable<TResult>> Run<TResult>(Func<Coroutine<TResult>> provider, CancellationToken cancellationToken)`                                       |
+| `Coroutine.Run` | `Coroutine<CoroutineAwaitable<TResult>> Run<TResult>(Func<Coroutine<TResult>> provider)`                                                                            |
+| `Coroutine.Run` | `Coroutine<CoroutineAwaitable<TResult>> Run<TClosure, TResult>(Func<TClosure, Coroutine<TResult>> provider, TClosure closure, CancellationToken cancellationToken)` |
+| `Coroutine.Run` | `Coroutine<CoroutineAwaitable<TResult>> Run<TClosure, TResult>(Func<TClosure, Coroutine<TResult>> provider, TClosure closure)`                                      |
+
+#### Tenekon.Coroutines.Coroutine.Run
+
+The `Coroutine.Factory.StartNew` yielder is the equivalent to `Task.Factory.StartNew`
+
+| Yielder                      | Signature                                                                                                                                                                                                                              |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable> StartNew(Func<Coroutine> provider, CancellationToken cancellationToken, TaskCreationOptions creationOptions, TaskScheduler scheduler)`                                                                  |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable> StartNew(Func<Coroutine> provider, CancellationToken cancellationToken)`                                                                                                                                |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable> StartNew(Func<Coroutine> provider, TaskCreationOptions creationOptions)`                                                                                                                                |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable> StartNew(Func<Coroutine> provider)`                                                                                                                                                                     |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable> StartNew<TClosure>(Func<TClosure, Coroutine> provider, TClosure closure, CancellationToken cancellationToken, TaskCreationOptions creationOptions, TaskScheduler scheduler)`                            |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable> StartNew<TClosure>(Func<TClosure, Coroutine> provider, TClosure closure, CancellationToken cancellationToken)`                                                                                          |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable> StartNew<TClosure>(Func<TClosure, Coroutine> provider, TClosure closure, TaskCreationOptions creationOptions)`                                                                                          |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable> StartNew<TClosure>(Func<TClosure, Coroutine> provider, TClosure closure)`                                                                                                                               |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable<TResult>> StartNew<TResult>(Func<Coroutine<TResult>> provider, CancellationToken cancellationToken, TaskCreationOptions creationOptions, TaskScheduler scheduler)`                                       |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable<TResult>> StartNew<TResult>(Func<Coroutine<TResult>> provider, CancellationToken cancellationToken)`                                                                                                     |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable<TResult>> StartNew<TResult>(Func<Coroutine<TResult>> provider, TaskCreationOptions creationOptions)`                                                                                                     |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable<TResult>> StartNew<TResult>(Func<Coroutine<TResult>> provider)`                                                                                                                                          |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable<TResult>> StartNew<TClosure, TResult>(Func<TClosure, Coroutine<TResult>> provider, TClosure closure, CancellationToken cancellationToken, TaskCreationOptions creationOptions, TaskScheduler scheduler)` |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable<TResult>> StartNew<TClosure, TResult>(Func<TClosure, Coroutine<TResult>> provider, TClosure closure, CancellationToken cancellationToken)`                                                               |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable<TResult>> StartNew<TClosure, TResult>(Func<TClosure, Coroutine<TResult>> provider, TClosure closure, TaskCreationOptions creationOptions)`                                                               |
+| `Coroutine.Factory.StartNew` | `Coroutine<CoroutineAwaitable<TResult>> StartNew<TClosure, TResult>(Func<TClosure, Coroutine<TResult>> provider, TClosure closure)`                                                                                                    |
 
 ### Tenekon.Coroutines.Yielders
 
-#### Call
+We recommend to make use of `using static`, e.g. `using static Tenekon.Coroutines.Yielders`.
+
+#### Tenekon.Coroutines.Yielders.Call
 
 The `Call` yielder is the equivalent to the `call` effect in Redux-Saga.
 
@@ -140,7 +209,7 @@ Use it to instruct the coroutine to suspend and invoke `provider` with optional 
 | `Call`  | `Coroutine<TResult> Call<TResult>(Func<Coroutine<TResult>> provider)`                                       |
 | `Call`  | `Coroutine<TResult> Call<TClosure, TResult>(Func<TClosure, Coroutine<TResult>> provider, TClosure closure)` |
 
-#### Launch
+#### Tenekon.Coroutines.Yielders.Launch
 
 The `Launch` yielder is the equivalent to the `fork` effect in Redux-Saga.
 
@@ -153,7 +222,7 @@ Use it to instruct the coroutine to suspend and invoke `provider` with optional 
 | `Launch` | `Coroutine<CoroutineAwaitable<TResult>> Launch<TResult>(Func<Coroutine<TResult>> provider)`                                       |
 | `Launch` | `Coroutine<CoroutineAwaitable<TResult>> Launch<TClosure, TResult>(Func<TClosure, Coroutine<TResult>> provider, TClosure closure)` |
 
-#### Spawn
+#### Tenekon.Coroutines.Yielders.Spawn
 
 The `Spawn` yielder is the equivalent to the `spawn` effect in Redux-Saga.
 
@@ -166,7 +235,7 @@ Use it to instruct the coroutine to suspend and invoke `provider` with optional 
 | `Spawn` | `Coroutine<CoroutineAwaitable<TResult>> Spawn<TResult>(Func<Coroutine<TResult>> provider)`                                       |
 | `Spawn` | `Coroutine<CoroutineAwaitable<TResult>> Spawn<TClosure, TResult>(Func<TClosure, Coroutine<TResult>> provider, TClosure closure)` |
 
-#### Spawn
+#### Tenekon.Coroutines.Yielders.Spawn
 
 Use `Throw` to instruct the coroutine to suspend and let the coroutine throw `exception`. The coroutine resumes immediatelly and throws `excpetion`.
 
@@ -174,7 +243,7 @@ Use `Throw` to instruct the coroutine to suspend and let the coroutine throw `ex
 | ------- | -------------------------------------- |
 | `Throw` | `Coroutine Throw(Exception exception)` |
 
-#### WithContext
+#### Tenekon.Coroutines.Yielders.WithContext
 
 Use `WithContext` to instruct the coroutine to suspend and invoke `provider` with `additiveContext` and optional `closure`.
 
@@ -185,15 +254,7 @@ Use `WithContext` to instruct the coroutine to suspend and invoke `provider` wit
 | `WithContext` | `Coroutine<TResult> WithContext<TResult>(CoroutineContext additiveContext, Func<Coroutine<TResult>> provider)`                                       |
 | `WithContext` | `Coroutine<TResult> WithContext<TClosure, TResult>(CoroutineContext additiveContext, Func<TClosure, Coroutine<TResult>> provider, TClosure closure)` |
 
-#### Yield
-
-Use `Yield` to instruct the coroutine to suspend and resume immediatelly. In the underlying is `Task.Yield()` used.
-
-| Yielder | Signature                     |
-| ------- | ----------------------------- |
-| `Yield` | `Coroutine Coroutine Yield()` |
-
-#### YieldReturn
+#### Tenekon.Coroutines.Yielders.YieldReturn
 
 Use `YieldReturn` to instruct the coroutine to suspend and resume immediatelly. Allows the coroutine middleware to get the hands on `value`.
 
@@ -201,7 +262,17 @@ Use `YieldReturn` to instruct the coroutine to suspend and resume immediatelly. 
 | ------------- | ----------------------------------- |
 | `YieldReturn` | `Coroutine YieldReturn<T>(T value)` |
 
-## Tenekon.Coroutines.Iterators.Yielders
+#### Tenekon.Coroutines.Yielders.YieldAssign
+
+Use `YieldAssign` to instruct the coroutine to suspend and resume immediatelly.
+Allows the coroutine middleware to get the hands on `value` and also to yield assign a custom value of type `TAssign`.
+If you do not yield assign a custom value of type `TAssign`, then `default(TAssign)` is yield assigned.
+
+| Yielder       | Signature                                                                                        |
+| ------------- | ------------------------------------------------------------------------------------------------ |
+| `YieldAssign` | `YieldAssign<TYield> Yield<TYield>(TYield value) => new(value)` -> `Coroutine<TAssign> Assign<TAssign>()` |
+
+## Tenekon.Coroutines.Yielders.Exchange
 
 Use `Exchange` to instruct the coroutine to suspend and resume immediatelly. Allows the coroutine middleware to get the hands on `value` and exchange it.
 

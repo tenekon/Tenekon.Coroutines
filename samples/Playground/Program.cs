@@ -1,21 +1,18 @@
-﻿using Tenekon.Coroutines;
+﻿using System.Diagnostics;
+using Tenekon.Coroutines;
 
 await Coroutine.Start(async () =>
 {
-    Console.WriteLine(Environment.CurrentManagedThreadId);
-
     var t1 = await Coroutine.Factory.StartNew(async () =>
     {
-        Console.WriteLine("Hello World " + Environment.CurrentManagedThreadId);
         Thread.Sleep(3000);
-        Console.WriteLine("Finished");
+        Console.WriteLine(DateTime.UtcNow - Process.GetCurrentProcess().StartTime.ToUniversalTime() + ": Finished");
     });
 
     var t2 = await Coroutine.Factory.StartNew(async () =>
     {
-        Console.WriteLine("Hello World " + Environment.CurrentManagedThreadId);
         Thread.Sleep(3000);
-        Console.WriteLine("Finished");
+        Console.WriteLine(DateTime.UtcNow - Process.GetCurrentProcess().StartTime.ToUniversalTime() + ": Finished");
     });
 
     await Task.WhenAll(t1.AsTask(), t2.AsTask());

@@ -20,9 +20,9 @@ public interface IAsyncIterator<TResult>
     /// <returns></returns>
     ValueTask<bool> MoveNextAsync();
 
-    void YieldReturn<TYieldResult>(TYieldResult result);
+    void YieldAssign<TYieldResult>(TYieldResult result);
 
-    void YieldReturn();
+    void YieldAssign();
 
     void Return(TResult result);
 

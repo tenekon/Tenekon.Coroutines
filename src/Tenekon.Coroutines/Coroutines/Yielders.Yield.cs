@@ -1,17 +1,9 @@
 ﻿using Tenekon.Coroutines.Sources;
-using static Tenekon.Coroutines.Yielders.Arguments;
 
 namespace Tenekon.Coroutines;
 
 partial class Yielders
 {
-    public static Coroutine Yield()
-    {
-        var completionSource = ManualResetCoroutineCompletionSource<VoidCoroutineResult>.RentFromCache();
-        var argument = new YieldArgument(completionSource);
-        return new(completionSource, argument);
-    }
-
     partial class Arguments
     {
         public class YieldArgument : ICallableArgument<ManualResetCoroutineCompletionSource<VoidCoroutineResult>>, ISiblingCoroutine

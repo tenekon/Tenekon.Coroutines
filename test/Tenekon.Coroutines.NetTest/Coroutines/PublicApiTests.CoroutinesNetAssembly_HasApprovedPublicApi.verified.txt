@@ -75,6 +75,7 @@ namespace Tenekon.Coroutines
         public static Tenekon.Coroutines.CompilerServices.CoroutineAwaitable<TResult> Start<TResult>(System.Func<Tenekon.Coroutines.Coroutine<TResult>> provider, Tenekon.Coroutines.CoroutineContext context = default) { }
         public static Tenekon.Coroutines.CompilerServices.CoroutineAwaitable Start<TClosure>(System.Func<TClosure, Tenekon.Coroutines.Coroutine> provider, TClosure closure, Tenekon.Coroutines.CoroutineContext context = default) { }
         public static Tenekon.Coroutines.CompilerServices.CoroutineAwaitable<TResult> Start<TClosure, TResult>(System.Func<TClosure, Tenekon.Coroutines.Coroutine<TResult>> provider, TClosure closure, Tenekon.Coroutines.CoroutineContext context = default) { }
+        public static Tenekon.Coroutines.Coroutine Yield() { }
         public static Tenekon.Coroutines.Coroutine op_Implicit(System.Threading.Tasks.Task task) { }
         public static Tenekon.Coroutines.Coroutine op_Implicit(System.Threading.Tasks.ValueTask task) { }
         public static bool operator !=(Tenekon.Coroutines.Coroutine left, Tenekon.Coroutines.Coroutine right) { }
@@ -287,8 +288,7 @@ namespace Tenekon.Coroutines
         public static Tenekon.Coroutines.Coroutine<TResult> WithContext<TResult>(in Tenekon.Coroutines.CoroutineContext additiveContext, Tenekon.Coroutines.CoroutineProviderDelegate<TResult> provider) { }
         public static Tenekon.Coroutines.Coroutine WithContext<TClosure>(in Tenekon.Coroutines.CoroutineContext additiveContext, Tenekon.Coroutines.CoroutineProviderWithClosureDelegate<TClosure> provider, TClosure closure) { }
         public static Tenekon.Coroutines.Coroutine<TResult> WithContext<TClosure, TResult>(in Tenekon.Coroutines.CoroutineContext additiveContext, Tenekon.Coroutines.CoroutineProviderWithClosureDelegate<TClosure, TResult> provider, TClosure closure) { }
-        public static Tenekon.Coroutines.Coroutine Yield() { }
-        public static Tenekon.Coroutines.Yielders.YieldReturnQuery<TValue> Yield<TValue>(TValue value) { }
+        public static Tenekon.Coroutines.Yielders.YieldAssign<TYield> Yield<TYield>(TYield value) { }
         public static Tenekon.Coroutines.Coroutine YieldReturn<T>(T value) { }
         public class Arguments
         {
@@ -300,9 +300,9 @@ namespace Tenekon.Coroutines
             public static readonly Tenekon.Coroutines.Key StartNewKey;
             public static readonly Tenekon.Coroutines.Key ThrowKey;
             public static readonly Tenekon.Coroutines.Key WithContextKey;
+            public static readonly Tenekon.Coroutines.Key YieldAssign;
             public static readonly Tenekon.Coroutines.Key YieldKey;
             public static readonly Tenekon.Coroutines.Key YieldReturnKey;
-            public static readonly Tenekon.Coroutines.Key YieldReturnVariantKey;
             public Arguments() { }
             public class CallArgument<TClosure> : Tenekon.Coroutines.ICallableArgument, Tenekon.Coroutines.ICallableArgument<Tenekon.Coroutines.Sources.ManualResetCoroutineCompletionSource<Tenekon.Coroutines.VoidCoroutineResult>>, Tenekon.Coroutines.ISiblingCoroutine
             {
@@ -458,7 +458,7 @@ namespace Tenekon.Coroutines
                 public override bool Equals([System.Diagnostics.CodeAnalysis.AllowNull] object obj) { }
                 public override int GetHashCode() { }
             }
-            public class YieldReturnArgument<TYield, TReturn> : Tenekon.Coroutines.ICallableArgument, Tenekon.Coroutines.ICallableArgument<Tenekon.Coroutines.Sources.ManualResetCoroutineCompletionSource<TReturn>>, Tenekon.Coroutines.ISiblingCoroutine
+            public class YieldReturnArgument<TYield, TAssign> : Tenekon.Coroutines.ICallableArgument, Tenekon.Coroutines.ICallableArgument<Tenekon.Coroutines.Sources.ManualResetCoroutineCompletionSource<TAssign>>, Tenekon.Coroutines.ISiblingCoroutine
             {
                 public YieldReturnArgument(TYield value) { }
                 public TYield Value { get; }
@@ -466,10 +466,10 @@ namespace Tenekon.Coroutines
                 public override int GetHashCode() { }
             }
         }
-        public readonly struct YieldReturnQuery<TYield>
+        public readonly struct YieldAssign<TYield>
         {
-            public YieldReturnQuery(TYield value) { }
-            public Tenekon.Coroutines.Coroutine<TReturn> Return<TReturn>() { }
+            public YieldAssign(TYield value) { }
+            public Tenekon.Coroutines.Coroutine<TAssign> Assign<TAssign>() { }
         }
     }
 }
@@ -548,8 +548,8 @@ namespace Tenekon.Coroutines.Iterators
         System.Threading.Tasks.ValueTask<bool> MoveNextAsync();
         void Return();
         void Throw(System.Exception e);
-        void YieldReturn();
-        void YieldReturn<TYieldResult>(TYieldResult result);
+        void YieldAssign();
+        void YieldAssign<TYieldResult>(TYieldResult result);
     }
     public interface IAsyncIterator<TResult>
     {
@@ -562,8 +562,8 @@ namespace Tenekon.Coroutines.Iterators
         System.Threading.Tasks.ValueTask<bool> MoveNextAsync();
         void Return(TResult result);
         void Throw(System.Exception e);
-        void YieldReturn();
-        void YieldReturn<TYieldResult>(TYieldResult result);
+        void YieldAssign();
+        void YieldAssign<TYieldResult>(TYieldResult result);
     }
     [System.Flags]
     public enum SuspensionPointState

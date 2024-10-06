@@ -83,7 +83,7 @@ public partial class AsyncIteratorTests
         {
             var iterator = CreateCoroutine().GetAsyncIterator();
             _ = await iterator.MoveNextAsync();
-            iterator.YieldReturn(ExpectedYieldResult);
+            iterator.YieldAssign(ExpectedYieldResult);
             var asyncResult = await iterator.GetResultAsync();
             var result = await Unwrap(asyncResult);
             result.Should().Be(await Unwrap(ExpectedYieldResult));
@@ -125,7 +125,7 @@ public partial class AsyncIteratorTests
             _ = await our.MoveNextAsync();
             var their = our.Clone();
             _ = await their.MoveNextAsync();
-            their.YieldReturn(ExpectedYieldResultOfClone);
+            their.YieldAssign(ExpectedYieldResultOfClone);
             var ourAsyncResult = await our.GetResultAsync();
             var ourResult = await Unwrap(ourAsyncResult);
             var theirAsyncResult = await their.GetResultAsync();

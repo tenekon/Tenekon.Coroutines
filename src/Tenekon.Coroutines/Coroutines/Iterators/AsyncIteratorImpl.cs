@@ -200,7 +200,7 @@ internal partial class AsyncIteratorImpl<TResult> : IAsyncIterator<TResult>, IAs
         return false;
     }
 
-    public void YieldReturn<TYieldResult>(TYieldResult result)
+    public void YieldAssign<TYieldResult>(TYieldResult result)
     {
         if (_nextSuspensionPoint._state != 0) {
             try {
@@ -220,7 +220,7 @@ internal partial class AsyncIteratorImpl<TResult> : IAsyncIterator<TResult>, IAs
         }
     }
 
-    public void YieldReturn()
+    public void YieldAssign()
     {
         if (_nextSuspensionPoint._state != 0) {
             try {
