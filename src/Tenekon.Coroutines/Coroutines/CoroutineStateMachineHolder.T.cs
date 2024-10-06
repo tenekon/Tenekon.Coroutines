@@ -124,7 +124,7 @@ internal sealed class CoroutineStateMachineHolder<TResult, [DAM(StateMachineMemb
                 throw new InvalidOperationException("Result state machine has already finished");
             }
 
-            newState = new CoroutineStateMachineBoxResult<TResult>(currentState.ForkCount + 1);
+            newState = new CoroutineStateMachineBoxResult<TResult>(currentState, currentState.ForkCount + 1);
         } while (!ReferenceEquals(Interlocked.CompareExchange(ref _result, newState, currentState), currentState));
     }
 
@@ -156,8 +156,8 @@ internal sealed class CoroutineStateMachineHolder<TResult, [DAM(StateMachineMemb
             }
 
             if (_coroutineContext._isCoroutineAsyncIteratorSupplier) {
-                Debug.Assert(currentState.CompletionSource is not null);
-                currentState.CompletionSource.SetDefaultResult();
+                Debug.Assert(currentState.CompletionPendingBackgroundTaskSource is not null);
+                currentState.CompletionPendingBackgroundTaskSource.SetDefaultResult();
             }
         }
     }
@@ -174,7 +174,7 @@ internal sealed class CoroutineStateMachineHolder<TResult, [DAM(StateMachineMemb
                 throw new InvalidOperationException("Result state machine has already finished");
             }
 
-            newState = new CoroutineStateMachineBoxResult<TResult>(currentState.ForkCount + 1);
+            newState = new CoroutineStateMachineBoxResult<TResult>(currentState, currentState.ForkCount + 1);
         } while (!ReferenceEquals(Interlocked.CompareExchange(ref _result, newState, currentState), currentState));
 
         forkAwaiter.UnsafeOnCompleted(() => {
@@ -212,8 +212,8 @@ internal sealed class CoroutineStateMachineHolder<TResult, [DAM(StateMachineMemb
                 }
 
                 if (_coroutineContext._isCoroutineAsyncIteratorSupplier) {
-                    Debug.Assert(currentState.CompletionSource is not null);
-                    currentState.CompletionSource.SetDefaultResult();
+                    Debug.Assert(currentState.CompletionPendingBackgroundTaskSource is not null);
+                    currentState.CompletionPendingBackgroundTaskSource.SetDefaultResult();
                 }
             }
         });
@@ -269,11 +269,11 @@ internal sealed class CoroutineStateMachineHolder<TResult, [DAM(StateMachineMemb
             return;
         }
 
-        if (isCoroutineAsyncIteratorSupplier) {
-            Debug.Assert(completionSource is not null);
-            var iteratorContextService = _coroutineContext.GetAsyncIteratorContextService();
-            iteratorContextService._currentSuspensionPoint.SupplyAwaiterCompletionNotifierInternal(completionSource);
-        }
+        //if (isCoroutineAsyncIteratorSupplier) {
+        //    Debug.Assert(completionSource is not null);
+        //    var iteratorContextService = _coroutineContext.GetAsyncIteratorContextService();
+        //    iteratorContextService._currentSuspensionPoint.SupplyAwaiterCompletionNotifierInternal(completionSource);
+        //}
     }
 
     /// <summary>Completes the box with an error.</summary>
@@ -301,11 +301,11 @@ internal sealed class CoroutineStateMachineHolder<TResult, [DAM(StateMachineMemb
             return;
         }
 
-        if (isCoroutineAsyncIteratorSupplier) {
-            Debug.Assert(completionSource is not null);
-            var iteratorContextService = _coroutineContext.GetAsyncIteratorContextService();
-            iteratorContextService._currentSuspensionPoint.SupplyAwaiterCompletionNotifierInternal(completionSource);
-        }
+        //if (isCoroutineAsyncIteratorSupplier) {
+        //    Debug.Assert(completionSource is not null);
+        //    var iteratorContextService = _coroutineContext.GetAsyncIteratorContextService();
+        //    iteratorContextService._currentSuspensionPoint.SupplyAwaiterCompletionNotifierInternal(completionSource);
+        //}
     }
 
     /// <summary>Get the result of the operation.</summary>

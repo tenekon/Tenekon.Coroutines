@@ -13,7 +13,18 @@ internal abstract class CoroutineStateMachineHolder<TResult> : IValueTaskSource<
     /// <summary>Gets the current version number of the box.</summary>
     public short Version => _valueTaskSource.Version;
 
-    public bool IsWaitingForChildrenToComplete => _result is CoroutineStateMachineBoxResult<TResult> result && (result.Status & CoroutineStateMachineBoxResult<TResult>.CoroutineStatus.Completed) != 0;
+    public bool TryGetCompletionPendingBackgroundTask(out ValueTask backgroundTask)
+    {
+        if (_result is CoroutineStateMachineBoxResult<TResult> result
+            && (result.Status & CoroutineStateMachineBoxResult<TResult>.CoroutineStatus.Completed) != 0
+            && result.CompletionPendingBackgroundTaskSource is not null) {
+            backgroundTask = result.CompletionPendingBackgroundTaskSource.CreateValueTask();
+            return true;
+        }
+
+        backgroundTask = default;
+        return false;
+    }
 
     /// <summary>A delegate to the MoveNext method.</summary>
     protected Action? _moveNextAction;

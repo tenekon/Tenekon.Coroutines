@@ -5,7 +5,7 @@ partial class YieldersTests
     /* FYI: Given `Coroutine.Start(() => Call(..))`, then the Calls's coroutine of Start's provider waits for coroutine of Call's provider. */
     public class LaunchTests
     {
-        [Fact]
+        [Test]
         public async Task AsyncLaunch_FlowsCorretly()
         {
             const int expectedResult = 1;
@@ -14,7 +14,7 @@ partial class YieldersTests
             result.Should().Be(expectedResult);
         }
 
-        [UIFact]
+        [Test]
         public async Task AsyncCallAwaitingAsyncLaunch_FlowsCorrectly()
         {
             int[] expectedRecords = [1, 2];
@@ -34,7 +34,7 @@ partial class YieldersTests
             records.Should().Equal(expectedRecords);
         }
 
-        [Fact]
+        [Test]
         public async Task AsyncCallReturningAsyncLaunch_FlowsCorretly()
         {
             int[] expectedRecords = [1, 2];

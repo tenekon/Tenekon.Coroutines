@@ -156,16 +156,15 @@ internal partial class AsyncIteratorImpl<TResult> : IAsyncIterator<TResult>, IAs
                     _nextSuspensionPoint._argument.Callback(in argumentReceiver, in _nextSuspensionPoint._argumentKey, _nextSuspensionPoint._argumentCompletionSource);
                     iteratorContextService._currentSuspensionPoint.RequireAwaiterCompletionNotifier();
                     await _nextSuspensionPoint._awaiterCompletionNotifier;
+
                     iteratorContext._coroutineStateMachineHolder.MoveNext();
 
-                    if (iteratorContext._coroutineAwaiter.IsCompleted) {
+                    if (iteratorContext._coroutineStateMachineHolder.TryGetCompletionPendingBackgroundTask(out var backgroundTask)) {
+                        await backgroundTask;
                         return false;
                     }
 
-                    if (iteratorContext._coroutineStateMachineHolder.IsWaitingForChildrenToComplete) {
-                        var nextSuspensionPoint = iteratorContextService._currentSuspensionPoint;
-                        iteratorContextService._currentSuspensionPoint.RequireAwaiterCompletionNotifier();
-                        await nextSuspensionPoint._awaiterCompletionNotifier;
+                    if (iteratorContext._coroutineAwaiter.IsCompleted) {
                         return false;
                     }
                 } else {

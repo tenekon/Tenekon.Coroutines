@@ -1,13 +1,11 @@
-﻿using FluentAssertions;
-using Tenekon.Reactive.Events;
+﻿using Tenekon.Reactive.Events;
 
 namespace Tenekon.Reactive.Broker;
 
 public partial class WheneverThenResubscribeTests
 {
-    [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
+    [TestCase(1)]
+    [TestCase(2)]
     public async Task Emitting_whenever_then_resubscribe_succeeds(int wheneverThenResubscribeEmitCounter)
     {
         var eventBroker = new EventBroker();
@@ -31,7 +29,7 @@ public partial class WheneverThenResubscribeTests
         emissionCounter.Should().Be(wheneverThenResubscribeEmitCounter);
     }
 
-    [Fact]
+    [Test]
     public async Task Emitting_resubscribe_then_whenever_fails()
     {
         var eventBroker = new EventBroker();
@@ -44,7 +42,7 @@ public partial class WheneverThenResubscribeTests
         invalid.Should().BeEquivalentTo(invalid);
     }
 
-    [Fact]
+    [Test]
     public async Task Emitting_whenever_then_two_resubscribe_leads_to_two_emissions()
     {
         var eventBroker = new EventBroker();

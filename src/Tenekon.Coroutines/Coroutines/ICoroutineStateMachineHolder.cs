@@ -7,7 +7,7 @@
 /// </summary>
 internal interface ICoroutineStateMachineHolder
 {
-    bool IsWaitingForChildrenToComplete { get; }
+    bool TryGetCompletionPendingBackgroundTask(out ValueTask backgroundTask);
 
     ref CoroutineContext CoroutineContext { get; }
 

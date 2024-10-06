@@ -1,4 +1,4 @@
-﻿global using Xunit;
+﻿global using NUnit.Framework;
 global using Tenekon.Reactive.Broker;
 global using FluentAssertions;
 global using static Tenekon.Infrastructure.GlobalParameters;

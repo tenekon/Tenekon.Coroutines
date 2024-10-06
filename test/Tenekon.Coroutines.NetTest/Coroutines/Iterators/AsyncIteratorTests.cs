@@ -5,7 +5,7 @@ public partial class AsyncIteratorTests
     internal const int One = 1;
     internal const int Two = One + 1;
 
-    [Fact]
+    [Test]
     public async Task Clone_DoesNotConsumesOriginalIterator()
     {
         const int OurResult = 1;
@@ -141,104 +141,104 @@ public partial class AsyncIteratorTests
     public abstract class AbstractSyncCoroutineWithSyncResult<TCoroutineResult, TUnwrappedResult>(TUnwrappedResult expectedResult)
         : AbstractCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>(expectedResult)
     {
-        [Fact]
+        [Test]
         public override Task MoveNext_ReturnsFalse() => base.MoveNext_ReturnsFalse();
 
-        [Fact]
+        [Test]
         public override Task GetResult_Returns() => base.GetResult_Returns();
 
-        [Fact]
+        [Test]
         public override Task GetResultAsync_Awaits() => base.GetResultAsync_Awaits();
 
-        [Fact]
+        [Test]
         public override void Throw_Fails() => base.Throw_Fails();
     }
 
     public abstract class AbstractSyncCoroutineWithAsyncResult<TCoroutineResult, TUnwrappedResult>(TUnwrappedResult expectedResult)
         : AbstractCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>(expectedResult)
     {
-        [Fact]
+        [Test]
         public override void GetResult_Throws() => base.GetResult_Throws();
 
-        [Fact]
+        [Test]
         public override Task GetResultAsync_Awaits() => base.GetResultAsync_Awaits();
 
-        [Fact]
+        [Test]
         public override Task MoveNext_ReturnsFalse() => base.MoveNext_ReturnsFalse();
     }
 
     public abstract class AbstractSyncCoroutineWithCoroutineWrappedResult<TCoroutineResult, TUnwrappedResult>(TUnwrappedResult expectedResult)
         : AbstractCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>(expectedResult)
     {
-        [Fact]
+        [Test]
         public override Task GetResultAsync_Awaits() => base.GetResultAsync_Awaits();
 
-        [Fact]
+        [Test]
         public override Task GetResult_Returns() => base.GetResult_Returns();
 
-        [Fact]
+        [Test]
         public override Task MoveNext_ReturnsFalse() => base.MoveNext_ReturnsFalse();
     }
 
     public abstract class AbstractAsyncCoroutineWithSyncResult<TCoroutineResult, TUnwrappedResult>(TUnwrappedResult expectedResult, TCoroutineResult expectedYieldResult)
         : AbstractAsyncCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>(expectedResult, expectedYieldResult)
     {
-        [Fact]
+        [Test]
         public override Task GetResultAsync_Awaits() => base.GetResultAsync_Awaits();
 
-        [Fact]
+        [Test]
         public override void GetResult_Throws() => base.GetResult_Throws();
 
-        [Fact]
+        [Test]
         public override Task MoveNext_ReturnsTrue() => base.MoveNext_ReturnsTrue();
 
-        [Fact]
+        [Test]
         public override Task MoveNextThenMoveNext_ReturnsFalse() => base.MoveNextThenMoveNext_ReturnsFalse();
 
-        [Fact]
+        [Test]
         public override void Throw_Fails() => base.Throw_Fails();
 
-        [Fact]
+        [Test]
         public override Task MoveNextThenYieldReturnThenGetResult_Returns() => base.MoveNextThenYieldReturnThenGetResult_Returns();
 
-        [Fact]
+        [Test]
         public override Task MoveNextThenMoveNextThenGetResult_Returns() => base.MoveNextThenMoveNextThenGetResult_Returns();
 
-        [Fact]
+        [Test]
         public override Task MoveNextThenGetResultAsync_Awaits() => base.MoveNextThenGetResultAsync_Awaits();
 
-        [Fact]
+        [Test]
         public override Task MoveNextThenThrow_Succeeds() => base.MoveNextThenThrow_Succeeds();
     }
 
     public abstract class AbstractAsyncCoroutineWithCoroutineWrappedResult<TCoroutineResult, TUnwrappedResult>(TUnwrappedResult expectedResult, TCoroutineResult expectedYieldResult)
         : AbstractAsyncCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>(expectedResult, expectedYieldResult)
     {
-        [Fact]
+        [Test]
         public override Task GetResultAsync_Awaits() => base.GetResultAsync_Awaits();
 
-        [Fact]
+        [Test]
         public override void GetResult_Throws() => base.GetResult_Throws();
 
-        [Fact]
+        [Test]
         public override Task MoveNext_ReturnsTrue() => base.MoveNext_ReturnsTrue();
 
-        [Fact]
+        [Test]
         public override Task MoveNextThenMoveNext_ReturnsFalse() => base.MoveNextThenMoveNext_ReturnsFalse();
 
-        [Fact]
+        [Test]
         public override void Throw_Fails() => base.Throw_Fails();
 
-        [Fact]
+        [Test]
         public override Task MoveNextThenYieldReturnThenGetResult_Returns() => base.MoveNextThenYieldReturnThenGetResult_Returns();
 
-        [Fact]
+        [Test]
         public override Task MoveNextThenMoveNextThenGetResult_Returns() => base.MoveNextThenMoveNextThenGetResult_Returns();
 
-        [Fact]
+        [Test]
         public override Task MoveNextThenGetResultAsync_Awaits() => base.MoveNextThenGetResultAsync_Awaits();
 
-        [Fact]
+        [Test]
         public override Task MoveNextThenThrow_Succeeds() => base.MoveNextThenThrow_Succeeds();
     }
 }

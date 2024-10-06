@@ -22,7 +22,7 @@ internal class CoroutineStateMachineBoxResult<TResult> : IEquatable<CoroutineSta
 
     public CoroutineStatus Status { get; init; }
     public TResult Result { get; init; }
-    public ManualResetCoroutineCompletionSource<VoidCoroutineResult>? CompletionSource { get; }
+    public ManualResetCoroutineCompletionSource<VoidCoroutineResult>? CompletionPendingBackgroundTaskSource { get; }
     public Exception? Exception { get; init; }
 
     private CoroutineStateMachineBoxResult()
@@ -36,12 +36,12 @@ internal class CoroutineStateMachineBoxResult<TResult> : IEquatable<CoroutineSta
         ForkCount = forkCount;
     }
 
-    public CoroutineStateMachineBoxResult(int forkCount, TResult result, ManualResetCoroutineCompletionSource<VoidCoroutineResult>? completionSource)
+    public CoroutineStateMachineBoxResult(int forkCount, TResult result, ManualResetCoroutineCompletionSource<VoidCoroutineResult>? completionPendingBackgroundTaskSource)
     {
         ForkCount = forkCount;
         Status = CoroutineStatus.CompletedSuccessfully;
         Result = result;
-        CompletionSource = completionSource;
+        CompletionPendingBackgroundTaskSource = completionPendingBackgroundTaskSource;
     }
 
     public CoroutineStateMachineBoxResult(int forkCount, Exception exception, ManualResetCoroutineCompletionSource<VoidCoroutineResult>? completionSource)
@@ -50,7 +50,7 @@ internal class CoroutineStateMachineBoxResult<TResult> : IEquatable<CoroutineSta
         Status = CoroutineStatus.Faulted;
         Result = default!;
         Exception = exception;
-        CompletionSource = completionSource;
+        CompletionPendingBackgroundTaskSource = completionSource;
     }
 
     public CoroutineStateMachineBoxResult(CoroutineStateMachineBoxResult<TResult> original, int forkCount)
@@ -59,7 +59,7 @@ internal class CoroutineStateMachineBoxResult<TResult> : IEquatable<CoroutineSta
         Status = original.Status;
         Result = original.Result;
         Exception = original.Exception;
-        CompletionSource = original.CompletionSource;
+        CompletionPendingBackgroundTaskSource = original.CompletionPendingBackgroundTaskSource;
     }
 
     public bool Equals(CoroutineStateMachineBoxResult<TResult>? other)
@@ -68,7 +68,7 @@ internal class CoroutineStateMachineBoxResult<TResult> : IEquatable<CoroutineSta
             return false;
         }
 
-        return ForkCount == other.ForkCount && Status == other.Status && !(CompletionSource is null ^ other.CompletionSource is null);
+        return ForkCount == other.ForkCount && Status == other.Status && !(CompletionPendingBackgroundTaskSource is null ^ other.CompletionPendingBackgroundTaskSource is null);
     }
 
     [Flags]

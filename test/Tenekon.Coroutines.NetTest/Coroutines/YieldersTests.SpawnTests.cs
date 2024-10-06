@@ -4,16 +4,16 @@ partial class YieldersTests
 {
     public class SpawnTests
     {
-        [Fact]
+        [Test]
         public async Task AsyncSpawn_FlowsCorretly()
         {
             const int expectedResult = 1;
             var awaitableResult = await Coroutine.Start(() => Spawn(async () => expectedResult));
             var result = await awaitableResult;
-            Assert.Equal(expectedResult, result);
+            result.Should().Be(expectedResult);
         }
 
-        [UIFact]
+        [Test]
         public async Task AsyncCallAwaitingAsyncSpawn_FlowsCorrectly()
         {
             int[] expectedRecords = [1];
@@ -28,10 +28,10 @@ partial class YieldersTests
                 records.Add(1);
             }));
 
-            Assert.Equal(expectedRecords, records);
+            records.Should().Equal(expectedRecords);
         }
 
-        [Fact]
+        [Test]
         public async Task AsyncCallReturningAsyncSpawn_FlowsCorretly()
         {
             int[] expectedRecords = [1];
@@ -47,7 +47,7 @@ partial class YieldersTests
                 return spawn;
             }));
 
-            Assert.Equal(expectedRecords, records);
+            records.Should().Equal(expectedRecords);
         }
     }
 }

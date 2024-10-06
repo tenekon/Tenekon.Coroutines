@@ -4,16 +4,15 @@ namespace Tenekon.Reactive.Broker;
 
 public partial class WheneverThenResubscribeTests
 {
-    public static IEnumerable<object[]> Emitting_whenever_then_replay_succeeds_generator()
+    public static IEnumerable<TestCaseData> Emitting_whenever_then_replay_succeeds_generator()
     {
-        yield return new object[] {
+        yield return new(
             new (object, object)[] { (1, 1), (2, 2) },
             new (object, object)[] { (1, 1), (2, 1) }
-        };
+        );
     }
 
-    [Theory]
-    [MemberData(nameof(Emitting_whenever_then_replay_succeeds_generator))]
+    [TestCaseSource(nameof(Emitting_whenever_then_replay_succeeds_generator))]
     public async Task Emitting_whenever_then_replay_succeeds((object, object)[] inputValues, (object, object)[] expectedValues)
     {
         var eventBroker = new EventBroker();
@@ -28,6 +27,6 @@ public partial class WheneverThenResubscribeTests
             await eventBroker.EmitAsync(resubscribeDiscriminator, input.Item2);
         }
 
-        Assert.Equal(expectedValues, actualEventDatas);
+        actualEventDatas.Should().Equal(expectedValues);
     }
 }

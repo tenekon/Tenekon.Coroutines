@@ -4,14 +4,13 @@ partial class AsyncIteratorTests
 {
     public class Call
     {
-        public static IEnumerable<object[]> NonGeneric_IsSiblingCoroutine_Generator()
+        public static IEnumerable<TestCaseData> NonGeneric_IsSiblingCoroutine_Generator()
         {
-            yield return [new ReleativeCoroutineHolder(Call(async () => { }))];
-            yield return [new ReleativeCoroutineHolder(Call(() => Call(async () => { })))];
+            yield return new(new ReleativeCoroutineHolder(Call(async () => { })));
+            yield return new(new ReleativeCoroutineHolder(Call(() => Call(async () => { }))));
         }
 
-        [Theory]
-        [MemberData(nameof(NonGeneric_IsSiblingCoroutine_Generator))]
+        [TestCaseSource(nameof(NonGeneric_IsSiblingCoroutine_Generator))]
         public void NonGeneric_IsSiblingCoroutine(ReleativeCoroutineHolder holder)
         {
             holder.Coroutine.CoroutineAction.Should().Be(CoroutineAction.Sibling);
