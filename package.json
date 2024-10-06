@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0-preview.2",
+  "version": "0.1.0-preview.3",
   "scripts": {
     "initial-release": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "release": "conventional-changelog -p angular -i CHANGELOG.md -s"
