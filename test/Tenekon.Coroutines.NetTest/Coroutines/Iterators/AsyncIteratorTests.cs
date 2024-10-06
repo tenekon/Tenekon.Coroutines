@@ -5,28 +5,9 @@ public partial class AsyncIteratorTests
     internal const int One = 1;
     internal const int Two = One + 1;
 
-    [Test]
-    public async Task Clone_DoesNotConsumesOriginalIterator()
+    public abstract class AbstractCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>
     {
-        const int OurResult = 1;
-        const int TheirResult = 2;
-        var our = AsyncIterator.Create(provider: new Func<Coroutine<int>>(async () => {
-            var one = await Exchange(OurResult);
-            return one;
-        }), isCloneable: true);
-        _ = await our.MoveNextAsync();
-        var their = our.Clone();
-        _ = await their.MoveNextAsync();
-        their.YieldReturn(TheirResult);
-        var ourResult = await our.GetResultAsync();
-        var theirResult = await their.GetResultAsync();
-        ourResult.Should().Be(OurResult);
-        theirResult.Should().Be(TheirResult);
-    }
-
-    public abstract class AbstractCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>(TUnwrappedResult expectedResult)
-    {
-        public TUnwrappedResult ExpectedResult { get; } = expectedResult;
+        public abstract TUnwrappedResult ExpectedResult { get; }
 
         protected abstract Coroutine<TCoroutineResult> CreateCoroutine();
         protected abstract ValueTask<TUnwrappedResult> Unwrap(TCoroutineResult resultWrapper);
@@ -92,11 +73,11 @@ public partial class AsyncIteratorTests
         }
     }
 
-    public abstract class AbstractAsyncCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>(TUnwrappedResult expectedResult, TCoroutineResult expectedYieldResult)
-        : AbstractCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>(expectedResult)
+    public abstract class AbstractAsyncCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>
+        : AbstractCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>
     {
-        public TCoroutineResult ExpectedYieldResult { get; } = expectedYieldResult;
-
+        public abstract TCoroutineResult ExpectedYieldResult { get; }
+        public abstract TCoroutineResult ExpectedYieldResultOfClone { get; }
 
         public virtual async Task MoveNextThenYieldReturnThenGetResult_Returns()
         {
@@ -136,10 +117,26 @@ public partial class AsyncIteratorTests
                 .Should()
                 .ThrowExactlyAsync<Exception1>();
         }
+
+        [Test]
+        public virtual async Task Clone_DoesNotConsumesOriginalIterator()
+        {
+            var our = AsyncIterator.Create(provider: CreateCoroutine, isCloneable: true);
+            _ = await our.MoveNextAsync();
+            var their = our.Clone();
+            _ = await their.MoveNextAsync();
+            their.YieldReturn(ExpectedYieldResultOfClone);
+            var ourAsyncResult = await our.GetResultAsync();
+            var ourResult = await Unwrap(ourAsyncResult);
+            var theirAsyncResult = await their.GetResultAsync();
+            var theirResult = await Unwrap(theirAsyncResult);
+            ourResult.Should().Be(ExpectedResult);
+            theirResult.Should().Be(await Unwrap(ExpectedYieldResultOfClone));
+        }
     }
 
-    public abstract class AbstractSyncCoroutineWithSyncResult<TCoroutineResult, TUnwrappedResult>(TUnwrappedResult expectedResult)
-        : AbstractCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>(expectedResult)
+    public abstract class AbstractSyncCoroutineWithSyncResult<TCoroutineResult, TUnwrappedResult>
+        : AbstractCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>
     {
         [Test]
         public override Task MoveNext_ReturnsFalse() => base.MoveNext_ReturnsFalse();
@@ -154,8 +151,8 @@ public partial class AsyncIteratorTests
         public override void Throw_Fails() => base.Throw_Fails();
     }
 
-    public abstract class AbstractSyncCoroutineWithAsyncResult<TCoroutineResult, TUnwrappedResult>(TUnwrappedResult expectedResult)
-        : AbstractCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>(expectedResult)
+    public abstract class AbstractSyncCoroutineWithAsyncResult<TCoroutineResult, TUnwrappedResult>
+        : AbstractCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>
     {
         [Test]
         public override void GetResult_Throws() => base.GetResult_Throws();
@@ -167,8 +164,8 @@ public partial class AsyncIteratorTests
         public override Task MoveNext_ReturnsFalse() => base.MoveNext_ReturnsFalse();
     }
 
-    public abstract class AbstractSyncCoroutineWithCoroutineWrappedResult<TCoroutineResult, TUnwrappedResult>(TUnwrappedResult expectedResult)
-        : AbstractCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>(expectedResult)
+    public abstract class AbstractSyncCoroutineWithCoroutineWrappedResult<TCoroutineResult, TUnwrappedResult>
+        : AbstractCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>
     {
         [Test]
         public override Task GetResultAsync_Awaits() => base.GetResultAsync_Awaits();
@@ -180,8 +177,8 @@ public partial class AsyncIteratorTests
         public override Task MoveNext_ReturnsFalse() => base.MoveNext_ReturnsFalse();
     }
 
-    public abstract class AbstractAsyncCoroutineWithSyncResult<TCoroutineResult, TUnwrappedResult>(TUnwrappedResult expectedResult, TCoroutineResult expectedYieldResult)
-        : AbstractAsyncCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>(expectedResult, expectedYieldResult)
+    public abstract class AbstractAsyncCoroutineWithSyncResult<TCoroutineResult, TUnwrappedResult>
+        : AbstractAsyncCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>
     {
         [Test]
         public override Task GetResultAsync_Awaits() => base.GetResultAsync_Awaits();
@@ -209,10 +206,13 @@ public partial class AsyncIteratorTests
 
         [Test]
         public override Task MoveNextThenThrow_Succeeds() => base.MoveNextThenThrow_Succeeds();
+
+        [Test]
+        public override Task Clone_DoesNotConsumesOriginalIterator() => base.Clone_DoesNotConsumesOriginalIterator();
     }
 
-    public abstract class AbstractAsyncCoroutineWithCoroutineWrappedResult<TCoroutineResult, TUnwrappedResult>(TUnwrappedResult expectedResult, TCoroutineResult expectedYieldResult)
-        : AbstractAsyncCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>(expectedResult, expectedYieldResult)
+    public abstract class AbstractAsyncCoroutineWithCoroutineWrappedResult<TCoroutineResult, TUnwrappedResult>
+        : AbstractAsyncCoroutineWithResultBase<TCoroutineResult, TUnwrappedResult>
     {
         [Test]
         public override Task GetResultAsync_Awaits() => base.GetResultAsync_Awaits();

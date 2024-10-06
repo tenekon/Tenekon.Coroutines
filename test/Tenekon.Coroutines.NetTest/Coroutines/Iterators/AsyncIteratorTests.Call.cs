@@ -16,15 +16,19 @@ partial class AsyncIteratorTests
             holder.Coroutine.CoroutineAction.Should().Be(CoroutineAction.Sibling);
         }
 
-        public class SyncCoroutineWithSyncResult() : AbstractSyncCoroutineWithSyncResult<int, int>(One)
+        public class SyncCoroutineWithSyncResult : AbstractSyncCoroutineWithSyncResult<int, int>
         {
+            public override int ExpectedResult => One;
+
             protected override Coroutine<int> CreateCoroutine() => Call(() => new Coroutine<int>(ExpectedResult));
             protected override ValueTask<int> Unwrap(int resultWrapper) => new(resultWrapper);
             protected override ValueTask<Coroutine<int>> Unwrap(Coroutine<int> coroutine) => new(coroutine);
         }
 
-        public class SyncCoroutineWithAsyncResult() : AbstractSyncCoroutineWithAsyncResult<int, int>(One)
+        public class SyncCoroutineWithAsyncResult : AbstractSyncCoroutineWithAsyncResult<int, int>
         {
+            public override int ExpectedResult => One;
+
             protected override Coroutine<int> CreateCoroutine() => Call(async () => {
                 await Task.Delay(ContinueAfterTimeInMs);
                 return ExpectedResult;
@@ -34,8 +38,12 @@ partial class AsyncIteratorTests
             protected override ValueTask<int> Unwrap(int resultWrapper) => new(resultWrapper);
         }
 
-        public class AsyncCoroutineWithCoroutineWrappedResult() : AbstractAsyncCoroutineWithCoroutineWrappedResult<int, int>(One, Two)
+        public class AsyncCoroutineWithCoroutineWrappedResult : AbstractAsyncCoroutineWithCoroutineWrappedResult<int, int>
         {
+            public override int ExpectedResult => One;
+            public override int ExpectedYieldResult => Two;
+            public override int ExpectedYieldResultOfClone => Two;
+
             protected override async Coroutine<int> CreateCoroutine() => await Call(async () => {
                 await Task.Delay(ContinueAfterTimeInMs);
                 return ExpectedResult;
