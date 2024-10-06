@@ -9,7 +9,7 @@ partial class YieldersTests
         public async Task AsyncLaunch_FlowsCorretly()
         {
             const int expectedResult = 1;
-            var awaitableResult = await Coroutine.Start(() => Launch(async () => expectedResult)).ConfigureAwait(false);
+            var awaitableResult = await Coroutine.Start(() => Launch(async () => expectedResult));
             var result = await awaitableResult;
             result.Should().Be(expectedResult);
         }
@@ -22,12 +22,12 @@ partial class YieldersTests
 
             var asyncResult = Coroutine.Start(() => Call(async () => {
                 var launch = await Launch(async () => {
-                    await Task.Delay(ContinueAfterTimeInMs).ConfigureAwait(false);
+                    await Task.Delay(ContinueAfterTimeInMs);
                     records.Add(2);
-                }).ConfigureAwait(false);
+                });
 
                 records.Add(1);
-            })).ConfigureAwait(false);
+            }));
 
             await asyncResult;
 
@@ -47,7 +47,7 @@ partial class YieldersTests
 
                 records.Add(1);
                 return launch;
-            })).ConfigureAwait(false);
+            }));
 
             records.Should().Equal(expectedRecords);
         }

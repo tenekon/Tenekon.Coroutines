@@ -10,6 +10,7 @@
 
     <TransitiveCoroutinesTargetFramework>$(TRANSITIVE_COROUTINES_TARGET_FRAMEWORK)</TransitiveCoroutinesTargetFramework>
     <TransitiveCoroutinesTargetFramework Condition="'$(TransitiveCoroutinesTargetFramework)' == ''">$(TargetFramework)</TransitiveCoroutinesTargetFramework>
+    <NoWarn>xUnit1024</NoWarn>
   </PropertyGroup>
 
   <Choose>

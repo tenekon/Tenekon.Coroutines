@@ -5,25 +5,33 @@ partial class AsyncIteratorTests
 {
     public class Launch
     {
-        public class ReturnSynchronously : AbstractReturnSynchronously<CoroutineAwaitable<int>, int>
+        public class SyncCoroutineWithSyncResult() : AbstractSyncCoroutineWithSyncResult<CoroutineAwaitable<int>, int>(One)
         {
-            protected override Coroutine<CoroutineAwaitable<int>> Constant() => Launch(() => Coroutine.FromResult(ExpectedResult));
+            protected override Coroutine<CoroutineAwaitable<int>> CreateCoroutine() => Launch(() => Coroutine.FromResult(ExpectedResult));
             protected override ValueTask<int> Unwrap(CoroutineAwaitable<int> resultWrapper) => resultWrapper;
             protected override async ValueTask<Coroutine<int>> Unwrap(Coroutine<CoroutineAwaitable<int>> coroutine) => await coroutine;
         }
 
-        public class ReturnAfterDelay : AbstractReturnAfterDelay<CoroutineAwaitable<int>, int>
+        public class SyncCoroutineWithAsyncResult() : AbstractSyncCoroutineWithCoroutineWrappedResult<CoroutineAwaitable<int>, int>(One)
         {
-            protected override Coroutine<CoroutineAwaitable<int>> ConstantAfterDelay() => Launch(async () => {
-                await Task.Delay(ContinueAfterTimeInMs).ConfigureAwait(false);
+            protected override Coroutine<CoroutineAwaitable<int>> CreateCoroutine() => Launch(async () => {
+                await Task.Delay(ContinueAfterTimeInMs);
                 return ExpectedResult;
             });
 
             protected override ValueTask<int> Unwrap(CoroutineAwaitable<int> resultWrapper) => resultWrapper;
             protected override async ValueTask<Coroutine<int>> Unwrap(Coroutine<CoroutineAwaitable<int>> x) => await x;
+        }
 
-            [Fact]
-            public override Task GetResult_Returns() => base.GetResult_Returns();
+        public class AsyncCoroutineWithAsyncResult() : AbstractAsyncCoroutineWithCoroutineWrappedResult<CoroutineAwaitable<int>, int>(One, Two)
+        {
+            protected override Coroutine<CoroutineAwaitable<int>> CreateCoroutine() => Launch(async () => {
+                await Task.Delay(ContinueAfterTimeInMs);
+                return ExpectedResult;
+            });
+
+            protected override ValueTask<int> Unwrap(CoroutineAwaitable<int> resultWrapper) => resultWrapper;
+            protected override async ValueTask<Coroutine<int>> Unwrap(Coroutine<CoroutineAwaitable<int>> x) => await x;
         }
     }
 }

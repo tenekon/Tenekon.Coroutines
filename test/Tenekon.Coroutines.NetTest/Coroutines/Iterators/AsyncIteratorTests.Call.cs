@@ -1,4 +1,5 @@
 ﻿namespace Tenekon.Coroutines.Iterators;
+
 partial class AsyncIteratorTests
 {
     public class Call
@@ -16,25 +17,33 @@ partial class AsyncIteratorTests
             holder.Coroutine.CoroutineAction.Should().Be(CoroutineAction.Sibling);
         }
 
-        public class ReturnSynchronously : AbstractReturnSynchronously<int, int>
+        public class SyncCoroutineWithSyncResult() : AbstractSyncCoroutineWithSyncResult<int, int>(One)
         {
-            protected override Coroutine<int> Constant() => Call(() => new Coroutine<int>(ExpectedResult));
+            protected override Coroutine<int> CreateCoroutine() => Call(() => new Coroutine<int>(ExpectedResult));
             protected override ValueTask<int> Unwrap(int resultWrapper) => new(resultWrapper);
             protected override ValueTask<Coroutine<int>> Unwrap(Coroutine<int> coroutine) => new(coroutine);
         }
 
-        public class ReturnAfterDelay : AbstractReturnAfterDelay<int, int>
+        public class SyncCoroutineWithAsyncResult() : AbstractSyncCoroutineWithAsyncResult<int, int>(One)
         {
-            protected override Coroutine<int> ConstantAfterDelay() => Call(async () => {
-                await Task.Delay(ContinueAfterTimeInMs).ConfigureAwait(false);
+            protected override Coroutine<int> CreateCoroutine() => Call(async () => {
+                await Task.Delay(ContinueAfterTimeInMs);
                 return ExpectedResult;
             });
 
-            protected override ValueTask<int> Unwrap(int resultWrapper) => new(resultWrapper);
             protected override ValueTask<Coroutine<int>> Unwrap(Coroutine<int> x) => ValueTask.FromResult(x);
+            protected override ValueTask<int> Unwrap(int resultWrapper) => new(resultWrapper);
+        }
 
-            [Fact]
-            public override Task GetResult_Throws() => base.GetResult_Throws();
+        public class AsyncCoroutineWithAsyncResult() : AbstractAsyncCoroutineWithCoroutineWrappedResult<int, int>(One, Two)
+        {
+            protected override async Coroutine<int> CreateCoroutine() => await Call(async () => {
+                await Task.Delay(ContinueAfterTimeInMs);
+                return ExpectedResult;
+            });
+
+            protected override ValueTask<Coroutine<int>> Unwrap(Coroutine<int> x) => ValueTask.FromResult(x);
+            protected override ValueTask<int> Unwrap(int resultWrapper) => new(resultWrapper);
         }
     }
 }
